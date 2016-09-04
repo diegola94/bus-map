@@ -29,9 +29,25 @@
       <ion-header-bar class="bar-stable">
         <h1 class="title">Santos Trans</h1>
       </ion-header-bar>
-      <ion-content ng-controller="MapController">
-         <div id="map" data-tap-disabled="true"></div>
-      </ion-content>
+
+      <ion-tabs class="tabs-positive tabs-icon-top">
+
+        <ion-tab title="Mapa" icon-on="ion-ios-filing" icon-off="ion-ios-filing-outline">          
+          <ion-content ng-controller="MapController">
+             <div id="map" data-tap-disabled="true"></div>
+          </ion-content>
+        </ion-tab>
+
+        <ion-tab title="Pontos de ônibus" icon-on="ion-ios-clock" icon-off="ion-ios-clock-outline">
+          <!-- Tab 2 content -->
+        </ion-tab>
+
+        <ion-tab title="Linhas" icon-on="ion-ios-gear" icon-off="ion-ios-gear-outline">
+          <!-- Tab 3 content -->
+        </ion-tab>
+
+      </ion-tabs>
+
     </ion-pane>
      <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBYoFKlbwRqwNGmkAW0Js4dWI0bQLlEslg"></script>
   </body>
