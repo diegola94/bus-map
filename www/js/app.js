@@ -24,15 +24,16 @@ var exampleApp = angular.module('starter', ['ionic'])
 })
 
 
-exampleApp.controller('MapController', function($scope, $ionicLoading) {
+exampleApp.controller('MapController', function($scope, $ionicLoading, $http) {
  
     google.maps.event.addDomListener(window, 'load', function() {
-        var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
+        var myLatlng = new google.maps.LatLng(-23.9343084, -46.3302259);
  
         var mapOptions = {
             center: myLatlng,
             zoom: 16,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            mapTypeId: google.maps.MapTypeId.ROADMAP,         
+
         };
  
         var map = new google.maps.Map(document.getElementById("map"), mapOptions);
@@ -45,6 +46,28 @@ exampleApp.controller('MapController', function($scope, $ionicLoading) {
                 title: "My Location"
             });
         });
+
+         //var json = $.getJSON("assets/points.json");
+         //var json = require('assets/points.json');
+        var mainInfo = $http.get('assets/points.json').success(function(response) {
+            return response.data;
+        });
+
+        console.log(mainInfo);
+
+        map.addListener('load', function(event) {
+          //addMarker(event.latLng);
+          //markers.push(marker);
+          
+        });
+
+        function addMarker(location) {
+          var marker = new google.maps.Marker({
+            position: location,
+            map: map
+        });
+          markers.push(marker);
+        }
  
         $scope.map = map;
     });
