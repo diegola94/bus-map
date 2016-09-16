@@ -26,14 +26,20 @@ var exampleApp = angular.module('starter', ['ionic'])
 
 exampleApp.controller('MapController', function($scope, $ionicLoading, $http) {
  
-    google.maps.event.addDomListener(window, 'load', function() {
-        var myLatlng = new google.maps.LatLng(-23.9343084, -46.3302259);
- 
+    google.maps.event.addDomListener(window, 'load', function() {                                                        
+        var myLatlng = new google.maps.LatLng(-23.9343084, -46.3302259);                 
+
         var mapOptions = {
             center: myLatlng,
             zoom: 16,
             mapTypeId: google.maps.MapTypeId.ROADMAP,         
-
+            mapTypeControl: false,
+            styles: [{
+              featureType: "transit.station.bus",
+              stylers: [
+                { visibility: "off" }
+              ]
+            }]
         };
  
         var map = new google.maps.Map(document.getElementById("map"), mapOptions);
@@ -42,34 +48,32 @@ exampleApp.controller('MapController', function($scope, $ionicLoading, $http) {
             map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
             var myLocation = new google.maps.Marker({
                 position: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
-                map: map,
-                title: "My Location"
+                map: map,                
+                title: "Você está aqui"
             });
         });
 
-         //var json = $.getJSON("assets/points.json");
-         //var json = require('assets/points.json');
-        var mainInfo = $http.get('assets/points.json').success(function(response) {
-            return response.data;
-        });
+        $.getJSON( "js/data/points.json", function( data ) {                                                
+            $.each( data, function() {
+                $(".bus-stop").append( "<li>" + this.ADDRESS + "</li>");
 
-        console.log(mainInfo);
+                var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);
+                
+                var marker = new google.maps.Marker({
+                    position: myLatlng,
+                    map: map,
+                    icon: 'img/icon-bus-stop.png'
+                });                              
 
-        map.addListener('load', function(event) {
-          //addMarker(event.latLng);
-          //markers.push(marker);
-          
-        });
-
-        function addMarker(location) {
-          var marker = new google.maps.Marker({
-            position: location,
-            map: map
-        });
-          markers.push(marker);
-        }
+            });                   
+        });              
  
         $scope.map = map;
     });
  
+    $.getJSON( "js/data/points.json", function( data ) {                                                
+        $.each( data, function() {
+            $(".bus-stop").append( "<li>" + this.ADDRESS + "</li>");
+        });                   
+    });              
 });
