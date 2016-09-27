@@ -9,6 +9,13 @@
 .bm-search{
     margin-left: 5%;
     position: absolute;
-    width: 90%;
-    margin-top: 15px;
+    width: 90%;    
+}
+
+.bm-search.bm-ida {
+	margin-top: 15px;
+}
+
+.bm-search.bm-volta {
+	margin-top: 75px;
 }

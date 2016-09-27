@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="bus-map">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *">
 
-    <title></title>
+    <title>Bus Map</title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
@@ -25,35 +25,53 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   </head>
-  <body ng-app="starter" ng-controller="MapController">
-    <ion-pane>      
-      <ion-tabs class="tabs-positive tabs-icon-top">
+  <body ng-app="starter">
+             
+    <ion-nav-view></ion-nav-view>
 
-        <ion-tab title="Mapa" icon-on="ion-ios-filing" icon-off="ion-ios-filing-outline">
-              <label class="item item-input bm-search">
-                  <i class="icon ion-search placeholder-icon"></i>
-                  <input type="search" placeholder="Search">
-              </label>
-              <div id="map" data-tap-disabled="true"></div>
-          
+    <script id="templates/tabs.html" type="text/ng-template">
+      <ion-tabs class="tabs-icon-top tabs-positive">
+
+        <ion-tab title="Home" icon="ion-home" href="#/tab/home">
+          <ion-nav-view name="home-tab"></ion-nav-view>
         </ion-tab>
 
-        <ion-tab title="Pontos de ônibus" icon-on="ion-icon" icon-off="ion-ios-clock-outline">
-            <ul class="bus-stop">            
-            </ul>
+        <ion-tab title="Pontos de Onibus" icon="ion-ios-information" href="#/tab/bus-stop">
+          <ion-nav-view name="bus-stop-tab"></ion-nav-view>
         </ion-tab>
 
-        <ion-tab title="Linhas" icon-on="ion-ios-gear" icon-off="ion-ios-gear-outline">
-          <!-- Tab 3 content -->
+        <ion-tab title="Contact" icon="ion-ios-world" ui-sref="tabs.contact">
+          <ion-nav-view name="contact-tab"></ion-nav-view>
         </ion-tab>
 
       </ion-tabs>
+    </script>
+    
+    <script id="templates/home.html" type="text/ng-template">
+      <ion-view view-title="Home">
+        <ion-content>
+            <label class="item item-input bm-search bm-ida">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="search" placeholder="Ida">
+            </label>
+            <label class="item item-input bm-search bm-volta">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="search" placeholder="Volta">
+            </label>
+            <div id="map" data-tap-disabled="true"></div>            
+        </ion-content>
+      </ion-view>
+    </script>        
 
-    </ion-pane>
+
+    <script id="templates/bus-stop.html" type="text/ng-template">
+      <ion-list>
+        <ion-item ng-repeat="BusStop in BusStopList">
+          Hello {{ BusStop.ADDRESS }}!
+        </ion-item>
+      </ion-list>
+    </script>        
+
      <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBYoFKlbwRqwNGmkAW0Js4dWI0bQLlEslg"></script>
   </body>
 </html>
-
-
-
-
