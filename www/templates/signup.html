@@ -1,0 +1,52 @@
+﻿<ion-view  view-title="Simple Application Page 1">
+     
+	 <ion-header-bar class="bar-positive" >
+            <h1 class="title">Sign up</h1>
+			
+			
+		
+		
+        </ion-header-bar>
+        <ion-content class="has-footer">
+		
+	
+		
+		
+		<form name="$parent.userForm">
+		<label class="item item-input">
+		  <span class="input-label">Email</span>
+		  <input type="email" name="email" placeholder="E-Mail" ng-model="member.email" >
+		</label>
+		
+			<label class="item item-input">
+			  <span class="input-label">Password</span>
+			  <input type="password" name="password" placeholder="Password" ng-model="member.password">
+			</label>
+		  
+		  
+		</form>
+			<div class="padding" ng-app="starter" ng-controller="Signup">
+			<br><br>
+			
+			  
+				<button class="button button-positive "  ng-click="createUser()">
+					Create User
+				</button>
+			  <br><br>
+
+			  <p ng-if="message">Message: <strong>{{ message }}</strong></p>
+			  <p ng-if="error">Error: <strong>{{ error }}</strong></p>
+			</div>
+
+			
+	    </ion-content>
+		
+		<ion-footer-bar align-title="left" class="bar-positive ">
+		<div class="button-bar ">
+  <a class="button button-clear" ng-click="signup()">Sign up</a>
+  <a class="button button-clear" ng-click="login()">Login</a>
+  <a class="button button-clear" ng-click="db_connect()">DB Connector</a>
+</div>
+			
+		</ion-footer-bar>
+    </ion-view> 

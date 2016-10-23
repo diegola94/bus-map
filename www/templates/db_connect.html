@@ -1,0 +1,50 @@
+﻿<ion-view  view-title="Simple Application Page 2">
+     
+	 <ion-header-bar class="bar-positive" >
+            <h1 class="title">Database Connector</h1>
+	</ion-header-bar>
+        <ion-content class="has-footer">
+		
+		<form name="$parent.dbForm">
+		<label class="item item-input">
+		  <span class="input-label  positive ">Reference Path:</span>
+		  <input type="text" name="ref" placeholder="ref path" ng-model="member.ref" >
+		</label>
+		
+			<label class="item item-input">
+			  <span class="input-label">Data 1:</span>
+			  <input type="text" name="data1" placeholder="data" ng-model="member.data1">
+			</label>
+			<label class="item item-input">
+			  <span class="input-label">Data 2:</span>
+			  <input type="text" name="data2" placeholder="data" ng-model="member.data2">
+			</label>
+			<label class="item item-input">
+			  <span class="input-label">Data 3:</span>
+			  <input type="text" name="data3" placeholder="data" ng-model="member.data3">
+			</label>
+		  <div class="padding" >
+		  <button class="button button-positive" ng-click="submit_db()">Submit Data to DB</button>
+		  
+		  </br>  </br> 
+	  
+			
+			
+				<input type = "text" size="70" ng-model = "user.id"><br><br>
+         	</div>
+       </form>
+		
+			
+		
+			
+	    </ion-content>
+		
+		<ion-footer-bar align-title="left" class="bar-positive ">
+		<div class="button-bar ">
+		  <a class="button button-clear" ng-click="signup()">Sign up</a>
+		  <a class="button button-clear" ng-click="login()" >Login</a>
+		  <a class="button button-clear" >DB Connector</a>
+		</div>
+			
+		</ion-footer-bar>
+    </ion-view> 

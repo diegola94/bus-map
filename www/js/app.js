@@ -3,7 +3,8 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('bus-map', ['ionic'])
+angular.module('starter', ['ionic',"firebase"])
+
 
 .factory('BusStopJson', function() {
     return {
@@ -23,14 +24,68 @@ angular.module('bus-map', ['ionic'])
     };
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.run(function($ionicPlatform) {
+  $ionicPlatform.ready(function() {
+    if(window.cordova && window.cordova.plugins.Keyboard) {
+      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+      // for form inputs)
+      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
 
-  $stateProvider
+      // Don't remove this line unless you know what you are doing. It stops the viewport
+      // from snapping when text inputs are focused. Ionic handles this internally for
+      // a much nicer keyboard experience.
+      cordova.plugins.Keyboard.disableScroll(true);
+    }
+    if(window.StatusBar) {
+      StatusBar.styleDefault();
+    }
+  });
+})
+.factory("Auth", ["$firebaseAuth",
+  function($firebaseAuth) {
+    return $firebaseAuth();
+  }
+])
+
+.config(function ($stateProvider, $urlRouterProvider) {
+    console.log("setting config");
+    // Ionic uses AngularUI Router which uses the concept of states
+    // Learn more here: https://github.com/angular-ui/ui-router
+    // Set up the various states which the app can be in.
+    // Each state's controller can be found in controllers.js
+    $stateProvider
+
+    // State to represent Login View
+    .state('login', {
+        url: "/login",
+        templateUrl: "templates/login.html",
+        controller: "Login"
+       
+    })
+
+
+    // setup an abstract state for the tabs directive
+    .state('signup', {
+        url: "/signup",
+        templateUrl: "templates/signup.html",
+        controller: "Signup"
+       
+    })
+
+    // Each tab has its own nav history stack:
+
+    .state('db_connect', {
+        url: '/db_connect',
+        templateUrl: "templates/db_connect.html",
+        controller: "DB_connect"
+    })
+
     .state('tabs', {
       url: "/tab",
       abstract: true,
       templateUrl: "templates/tabs.html"
     })
+
     .state('tabs.home', {
       url: "/home",
       views: {
@@ -40,21 +95,162 @@ angular.module('bus-map', ['ionic'])
         }
       }
     })
+
     .state('tabs.bus-stop', {
       url: "/bus-stop",
       views: {
         'bus-stop-tab': {
           templateUrl: "templates/bus-stop.html",
-          controller: 'BusStopController'
+          controller: 'MapController'
         }
       }
     });
 
-   $urlRouterProvider.otherwise("/tab/home");
+    // if none of the above states are matched, use this as the fallback
+    $urlRouterProvider.otherwise('/signup');
 
 })
 
-.controller('MapController', function($scope, $ionicLoading, $http, BusStopJson) {                  
+	.controller("DB_connect",  ["$scope", "Auth",'$state',
+    function($scope, Auth,$state) {
+	
+	
+	
+	
+	$scope.submit_db = function() {
+			$refpath = $scope.dbForm.ref.$modelValue;
+			$data1 = $scope.dbForm.data1.$modelValue;
+			$data2 = $scope.dbForm.data2.$modelValue;
+			$data3 = $scope.dbForm.data3.$modelValue;
+			
+		//write data to db with current user
+		firebase.database().ref($refpath).set({
+			data1: $data1,
+			data2: $data2,
+			data3 : $data3
+		}).then(function() {
+         alert("Data submitted");
+        })
+		.catch(function(error) {
+		    
+			alert(error.message);
+        });
+	}	
+		//go to first tab
+		 $scope.signup = function() {
+		   $state.go('signup');
+		}
+		//go to db tab
+		 $scope.login = function() {
+		   $state.go('login');
+		}
+		
+	}])
+	
+	
+	.controller("Login",  ["$scope", "Auth",'$state',
+    function($scope, Auth,$state) {
+  
+      	//go to first tab
+      	 $scope.signup = function() {
+             $state.go('signup');
+      	}
+      	//go to db tab
+      	 $scope.db_connect = function() {
+             $state.go('db_connect');
+      	}
+      	 $scope.signout = function() {
+           firebase.auth().signOut().then(function() {
+               alert("Signed out successfully");
+              })
+      		.catch(function(error) {
+      		    
+      			alert(error.message);
+              });
+        }
+      	
+        $scope.getuser = function() {
+           
+      	 //get current user if signed in
+           var user = firebase.auth().currentUser;
+
+      			if (user) {
+      			  //show user id on screen if signed in
+      				$scope.user = {
+      				id: 'User ID: ' + user.uid};
+      			} else {
+      			  $scope.user = {
+      				id: 'no user signed in'};
+      			}
+      			   
+      	
+        }
+      	
+        $scope.login = function() {
+               
+          	$signin_email = $scope.userloginForm.email.$modelValue;
+          	$signin_password = $scope.userloginForm.password.$modelValue;
+          		
+          	 // sign in
+            Auth.$signInWithEmailAndPassword($signin_email, $signin_password)
+              .then(function(firebaseUser) {
+                  //$scope.message = "User created with uid: " + firebaseUser.uid;            
+      		        alert(firebaseUser.email + " logged in successfully!");
+                  $state.go('tabs.home');
+              }).catch(function(error) {		    
+      			      alert(error.message);
+                  //$scope.error = error;
+              });
+      		
+
+          };	       
+  }])
+  
+.controller("Signup",  ["$scope", "Auth",'$state',
+  function($scope, Auth,$state) {
+	
+	
+	$scope.login = function(){
+	     $state.go('login');
+	}
+	//go to db tab
+	 $scope.db_connect = function() {
+       $state.go('db_connect');
+	}
+	
+    $scope.createUser = function() {
+      $scope.message = null;
+      $scope.error = null;
+	  
+	  //get users email and password from ui
+		$email_str = $scope.userForm.email.$modelValue;
+		$password_str = $scope.userForm.password.$modelValue;
+ 
+      // Create a new user
+      Auth.$createUserWithEmailAndPassword($email_str, $password_str)
+        .then(function(firebaseUser) {
+          $scope.message = "User created with uid: " + firebaseUser.uid;
+        }).catch(function(error) {
+          $scope.error = error;
+        });
+    };
+
+    $scope.deleteUser = function() {
+      $scope.message = null;
+      $scope.error = null;
+
+      // Delete the currently signed-in user
+      Auth.$deleteUser().then(function() {
+        $scope.message = "User deleted";
+      }).catch(function(error) {
+        $scope.error = error;
+      });
+    };
+  }
+])
+
+.controller('MapController',  ["$scope", '$ionicLoading', '$http', "BusStopJson", 
+  function($scope, $ionicLoading, $http, BusStopJson) {                  
       google.maps.event.addDomListener(window, 'load', function() {
             var myLatlng = new google.maps.LatLng(-23.9343084, -46.3302259);                 
 
@@ -159,54 +355,9 @@ angular.module('bus-map', ['ionic'])
                   });            
                   event.preventDefault();
             });
-
-            /*var infowindow = new google.maps.InfoWindow();
-            var marker = new google.maps.Marker({
-              map: map,
-              anchorPoint: new google.maps.Point(0, -29)
-            });
-
-            autocomplete.addListener('place_changed', function() {
-                  infowindow.close();
-                  marker.setVisible(false);
-                  var place = autocomplete.getPlace();
-                  if (!place.geometry) {
-                    window.alert("Autocomplete's returned place contains no geometry");
-                    return;
-                  }
-
-                  // If the place has a geometry, then present it on a map.
-                  if (place.geometry.viewport) {
-                    map.fitBounds(place.geometry.viewport);
-                  } else {
-                    map.setCenter(place.geometry.location);
-                    map.setZoom(17);  // Why 17? Because it looks good.
-                  }
-                  marker.setIcon(({
-                    url: place.icon,
-                    size: new google.maps.Size(71, 71),
-                    origin: new google.maps.Point(0, 0),
-                    anchor: new google.maps.Point(17, 34),
-                    scaledSize: new google.maps.Size(35, 35)
-                  }));
-                  marker.setPosition(place.geometry.location);
-                  marker.setVisible(true);
-
-                  var address = '';
-                  if (place.address_components) {
-                    address = [
-                      (place.address_components[0] && place.address_components[0].short_name || ''),
-                      (place.address_components[1] && place.address_components[1].short_name || ''),
-                      (place.address_components[2] && place.address_components[2].short_name || '')
-                    ].join(' ');
-                  }
-
-                  infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
-                  infowindow.open(map, marker);
-            });*/
-            //Fim teste
       });               
-})
+}
+])
 
 .controller('BusStopController', function($scope, $ionicLoading, $http, BusStopJson) {    
       $scope.BusStopList = BusStopJson.busStopList;      
