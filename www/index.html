@@ -50,15 +50,19 @@
     <script id="templates/home.html" type="text/ng-template">
       <ion-view view-title="Home">
         <ion-content>
-            <label class="item item-input bm-search bm-ida">
-                <i class="icon ion-search placeholder-icon"></i>
-                <input type="search" placeholder="Ida">
-            </label>
-            <label class="item item-input bm-search bm-volta">
-                <i class="icon ion-search placeholder-icon"></i>
-                <input type="search" placeholder="Volta">
-            </label>
+            <form id="calcRouteForm">
+                <label class="item item-input bm-search bm-ida">
+                    <i class="icon ion-search placeholder-icon"></i>
+                    <input type="search" id="txtOrigin" placeholder="Origem">
+                </label>
+                <label class="item item-input bm-search bm-volta">
+                    <i class="icon ion-search placeholder-icon"></i>
+                    <input type="search" id="txtDestination" placeholder="Destino">
+                </label>
+                <input type="submit" value="Busca">
+            </form>
             <div id="map" data-tap-disabled="true"></div>            
+        
         </ion-content>
       </ion-view>
     </script>        
@@ -72,6 +76,6 @@
       </ion-list>
     </script>        
 
-     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBYoFKlbwRqwNGmkAW0Js4dWI0bQLlEslg"></script>
+     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBYoFKlbwRqwNGmkAW0Js4dWI0bQLlEslg&libraries=places"></script>
   </body>
 </html>
