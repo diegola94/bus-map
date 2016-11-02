@@ -1,8 +1,6 @@
-.logo {
-    display: block;
-    position: relative;
-    width: 60%;
-    margin: 0 auto;
+.logo {        
+    width: 40%;    
+    padding: 10px;
 }
 .logoText {
     text-align: center;
@@ -38,4 +36,18 @@
 
 .bm-search.bm-volta {
     margin-top: 75px;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+.right {
+    float: right;
+}
+
+.left {
+    float: left;
 }

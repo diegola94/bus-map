@@ -1,33 +1,31 @@
-﻿<ion-view  view-title="Simple Application Page 2">
-     
-	 <ion-header-bar class="bar-positive" >
-            <h1 class="title">Login</h1>
-	</ion-header-bar>
-        <ion-content class="has-footer">
+﻿<ion-view  view-title="Bus Map">
+     	
+        
 		
+        <img src="../img/bus-map-logo.png" class="center logo">
+
 		<form name="$parent.userloginForm">
-		<label class="item item-input">
-		  <span class="input-label">Email</span>
-		  <input type="email" name="email" placeholder="E-Mail" ng-model="member.email" >
-		</label>
-		
 			<label class="item item-input">
-			  <span class="input-label">Password</span>
-			  <input type="password" name="password" placeholder="Password" ng-model="member.password">
+				  <span class="input-label">Email</span>
+				  <input type="email" name="email" placeholder="Email" ng-model="member.email" >
 			</label>
-		  <div class="padding" >
-		  <button class="button button-positive" ng-click="login()">Login</button>
-		  
-		  </br>  </br> 
-	  
-			<button class="button button-positive" ng-click="getuser()">Get User ID</button>
 			
-			
-			
-				<input type = "text" size="70" ng-model = "user.id"><br><br>
-         
-         	<button class="button button-positive" ng-click="signout()">Sign Out</button>
-		</div>
+			<label class="item item-input">
+				  <span class="input-label">Password</span>
+				  <input type="password" name="password" placeholder="Password" ng-model="member.password">
+			</label>
+			<div class="padding">
+			  
+			  	<button class="button button-positive col" ng-click="login()">Login</button>
+			  	<br />
+				<a class="left" href="#" ng-click="signup()">Não possui uma conta? Cadastre-se! </a>
+				  				  				  		
+			  
+				<!--<button class="button button-positive right" ng-click="getuser()">Get User ID</button>								
+					<input type = "text" size="70" ng-model = "user.id"><br><br>
+	         
+	         	<button class="button button-positive" ng-click="signout()">Sign Out</button>-->
+			</div>
        </form>
 		
 			
@@ -35,12 +33,11 @@
 			
 	    </ion-content>
 		
-		<ion-footer-bar align-title="left" class="bar-positive ">
+		<!-- <ion-footer-bar align-title="left" class="bar-positive ">
 		<div class="button-bar ">
 		  <a class="button button-clear" ng-click="signup()">Sign up</a>
 		  <a class="button button-clear" >Login</a>
 		  <a class="button button-clear" ng-click="db_connect()">DB Connector</a>
-		</div>
-			
-		</ion-footer-bar>
+		</div>			
+		</ion-footer-bar>-->
     </ion-view> 

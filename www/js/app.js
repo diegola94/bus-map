@@ -111,142 +111,150 @@ angular.module('starter', ['ionic',"firebase"])
 
 })
 
-	.controller("DB_connect",  ["$scope", "Auth",'$state',
-    function($scope, Auth,$state) {
+.controller("DB_connect",  ["$scope", "Auth",'$state',
+  function($scope, Auth,$state) {
+
+    	$scope.submit_db = function() {
+    			$refpath = $scope.dbForm.ref.$modelValue;
+    			$data1 = $scope.dbForm.data1.$modelValue;
+    			$data2 = $scope.dbForm.data2.$modelValue;
+    			$data3 = $scope.dbForm.data3.$modelValue;
+    			
+    		//write data to db with current user
+    		firebase.database().ref($refpath).set({
+    			data1: $data1,
+    			data2: $data2,
+    			data3 : $data3
+    		}).then(function() {
+             alert("Data submitted");
+            })
+    		.catch(function(error) {
+    		    
+    			alert(error.message);
+            });
+    	}	
+  		
+      //go to first tab
+  		$scope.signup = function() {
+  		   $state.go('signup');
+  		}
+  		
+      //go to db tab
+  		$scope.login = function() {
+  		   $state.go('login');
+  		}		
+}])
 	
 	
-	
-	
-	$scope.submit_db = function() {
-			$refpath = $scope.dbForm.ref.$modelValue;
-			$data1 = $scope.dbForm.data1.$modelValue;
-			$data2 = $scope.dbForm.data2.$modelValue;
-			$data3 = $scope.dbForm.data3.$modelValue;
-			
-		//write data to db with current user
-		firebase.database().ref($refpath).set({
-			data1: $data1,
-			data2: $data2,
-			data3 : $data3
-		}).then(function() {
-         alert("Data submitted");
-        })
-		.catch(function(error) {
-		    
-			alert(error.message);
+.controller("Login",  ["$scope", "Auth",'$state',
+  function($scope, Auth,$state) {
+
+    	//go to first tab
+    	$scope.signup = function() {
+           $state.go('signup');
+    	}
+    	//go to db tab
+    	$scope.db_connect = function() {
+           $state.go('db_connect');
+    	}
+    	$scope.signout = function() {
+         firebase.auth().signOut().then(function() {
+             alert("Signed out successfully");
+            })
+    		.catch(function(error) {      		    
+    			alert(error.message);
         });
-	}	
-		//go to first tab
-		 $scope.signup = function() {
-		   $state.go('signup');
-		}
-		//go to db tab
-		 $scope.login = function() {
-		   $state.go('login');
-		}
-		
-	}])
-	
-	
-	.controller("Login",  ["$scope", "Auth",'$state',
-    function($scope, Auth,$state) {
-  
-      	//go to first tab
-      	 $scope.signup = function() {
-             $state.go('signup');
-      	}
-      	//go to db tab
-      	 $scope.db_connect = function() {
-             $state.go('db_connect');
-      	}
-      	 $scope.signout = function() {
-           firebase.auth().signOut().then(function() {
-               alert("Signed out successfully");
-              })
-      		.catch(function(error) {
-      		    
-      			alert(error.message);
-              });
-        }
-      	
-        $scope.getuser = function() {
-           
-      	 //get current user if signed in
-           var user = firebase.auth().currentUser;
+      }
+    	
+      $scope.getuser = function() {
+         
+    	    //get current user if signed in
+          var user = firebase.auth().currentUser;
 
-      			if (user) {
-      			  //show user id on screen if signed in
-      				$scope.user = {
-      				id: 'User ID: ' + user.uid};
-      			} else {
-      			  $scope.user = {
-      				id: 'no user signed in'};
-      			}
-      			   
-      	
-        }
-      	
-        $scope.login = function() {
-               
-          	$signin_email = $scope.userloginForm.email.$modelValue;
-          	$signin_password = $scope.userloginForm.password.$modelValue;
-          		
-          	 // sign in
-            Auth.$signInWithEmailAndPassword($signin_email, $signin_password)
-              .then(function(firebaseUser) {
-                  //$scope.message = "User created with uid: " + firebaseUser.uid;            
-      		        alert(firebaseUser.email + " logged in successfully!");
-                  $state.go('tabs.home');
-              }).catch(function(error) {		    
-      			      alert(error.message);
-                  //$scope.error = error;
+    			if (user) {
+    			  //show user id on screen if signed in
+    				$scope.user = {
+    				id: 'User ID: ' + user.uid};aaaaaaaaaa
+    			} else {
+    			  $scope.user = {
+    				id: 'no user signed in'};
+    			}      			 
+    	
+      }
+    	
+      $scope.login = function() {
+             
+        	$signin_email = $scope.userloginForm.email.$modelValue;
+        	$signin_password = $scope.userloginForm.password.$modelValue;
+        		
+          
+          if ($signin_email === undefined || $signin_email === "" || $signin_email === null) {
+            alert("Email inválido.");
+          } 
+          else if ($signin_password === undefined || $signin_password === "" || $signin_password === null) {
+            alert("Preecha o campo senha.");
+          } else {
+            	// sign in
+              Auth.$signInWithEmailAndPassword($signin_email, $signin_password)
+                  .then(function(firebaseUser) {
+                      //$scope.message = "User created with uid: " + firebaseUser.uid;            
+          		        alert(firebaseUser.email + " logged in successfully!");
+                      $state.go('tabs.home');
+                  }).catch(function(error) {		    
+          			      alert(error.message);
+                      //$scope.error = error;
               });
-      		
-
-          };	       
-  }])
+          }      
+      }	       
+}])
   
 .controller("Signup",  ["$scope", "Auth",'$state',
-  function($scope, Auth,$state) {
-	
-	
-	$scope.login = function(){
-	     $state.go('login');
-	}
-	//go to db tab
-	 $scope.db_connect = function() {
-       $state.go('db_connect');
-	}
-	
-    $scope.createUser = function() {
-      $scope.message = null;
-      $scope.error = null;
-	  
-	  //get users email and password from ui
-		$email_str = $scope.userForm.email.$modelValue;
-		$password_str = $scope.userForm.password.$modelValue;
- 
-      // Create a new user
-      Auth.$createUserWithEmailAndPassword($email_str, $password_str)
-        .then(function(firebaseUser) {
-          $scope.message = "User created with uid: " + firebaseUser.uid;
+  function($scope, Auth,$state) {	
+    	$scope.login = function(){
+    	     $state.go('login');
+    	}
+    	//go to db tab
+    	 $scope.db_connect = function() {
+           $state.go('db_connect');
+    	}
+  	
+      $scope.createUser = function() {
+        $scope.message = null;
+        $scope.error = null;
+  	  
+    	  //get users email and password from ui
+    		$email_str = $scope.userForm.email.$modelValue;
+    		$password_str = $scope.userForm.password.$modelValue;
+     
+        if ($email_str === undefined || $email_str === "" || $email_str === null) {
+          alert("Email inválido.");
+        } 
+        else if ($password_str === undefined || $password_str === "" || $password_str === null) {
+          alert("Preecha o campo senha.");
+        } else {
+          // Create a new user
+          Auth.$createUserWithEmailAndPassword($email_str, $password_str)
+            .then(function(firebaseUser) {
+              $scope.message = "User created with uid: " + firebaseUser.uid;
+            }).catch(function(error) {
+              alert(error.message);
+              $scope.error = error;
+            });
+        }
+      };
+
+      $scope.deleteUser = function() {
+        $scope.message = null;
+        $scope.error = null;
+
+        // Delete the currently signed-in user
+        Auth.$deleteUser().then(function() {
+          $scope.message = "User deleted";
         }).catch(function(error) {
           $scope.error = error;
         });
-    };
-
-    $scope.deleteUser = function() {
-      $scope.message = null;
-      $scope.error = null;
-
-      // Delete the currently signed-in user
-      Auth.$deleteUser().then(function() {
-        $scope.message = "User deleted";
-      }).catch(function(error) {
-        $scope.error = error;
-      });
-    };
-  }
+      };
+    }
 ])
 
 .controller('MapController',  ["$scope", '$ionicLoading', '$http', "BusStopJson", 
