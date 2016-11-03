@@ -1,0 +1,25 @@
+[
+
+{
+    "LINHAS": [
+      {
+        "LINHA": "19"
+      },
+      {
+        "LINHA": "29",
+        "ENDERECO": "aaa",
+
+      },
+      {
+        "LINHA": "30"
+      },
+      {
+        "LINHA": "156"
+      }
+    ],
+    "COORDINATEX": "-46.314230",
+    "COORDINATEY": "-23.962941",
+    "ADDRESS": "Av. Afonso Pena 232"
+  }
+
+]

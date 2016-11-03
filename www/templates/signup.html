@@ -1,28 +1,32 @@
-﻿<ion-view  view-title="Simple Application Page 1">
+﻿<ion-view  view-title="Bus Map">
      
 	 	<ion-header-bar class="bar-positive" >
-            <h1 class="title">Sign up</h1>
+            <h1 class="title">Cadastro</h1>
 		</ion-header-bar>
         
         <ion-content class="has-header">
 					
 		<form name="$parent.userForm">
-		<label class="item item-input">
-		  <span class="input-label">Email</span>
-		  <input type="email" name="email" placeholder="E-Mail" ng-model="member.email" >
-		</label>
+			<label class="item item-input">
+			  <span class="input-label">Email</span>
+			  <input type="email" name="email" placeholder="Email" ng-model="member.email" >
+			</label>
 		
 			<label class="item item-input">
-			  <span class="input-label">Password</span>
-			  <input type="password" name="password" placeholder="Password" ng-model="member.password">
+			  <span class="input-label">Senha</span>
+			  <input type="password" name="password" placeholder="Senha" ng-model="member.password">
 			</label>
 		  
+		  	<label class="item item-input">
+			  <span class="input-label">Confirmar Senha</span>
+			  <input type="password" name="password" placeholder="Confirmar Senha" ng-model="member.password">
+			</label>
 		  
 		</form>
 		<div class="padding row" ng-app="starter" ng-controller="Signup">			
-			<a class="button icon-left ion-chevron-left button-clear button-dark col" ng-click="login()">Back</a>			  
+			<a class="button icon-left ion-chevron-left button-clear button-dark col" ng-click="login()">Voltar</a>
 			<button class="button button-positive col"  ng-click="createUser()">
-				Create User
+				Cadastrar
 			</button>
 		
 			<!-- <p ng-if="message">Message: <strong>{{ message }}</strong></p>

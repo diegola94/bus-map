@@ -47,8 +47,7 @@ angular.module('starter', ['ionic',"firebase"])
   }
 ])
 
-.config(function ($stateProvider, $urlRouterProvider) {
-    console.log("setting config");
+.config(function ($stateProvider, $urlRouterProvider) {    
     // Ionic uses AngularUI Router which uses the concept of states
     // Learn more here: https://github.com/angular-ui/ui-router
     // Set up the various states which the app can be in.
@@ -59,8 +58,7 @@ angular.module('starter', ['ionic',"firebase"])
     .state('login', {
         url: "/login",
         templateUrl: "templates/login.html",
-        controller: "Login"
-       
+        controller: "Login"       
     })
 
 
@@ -101,13 +99,13 @@ angular.module('starter', ['ionic',"firebase"])
       views: {
         'bus-stop-tab': {
           templateUrl: "templates/bus-stop.html",
-          controller: 'MapController'
+          controller: 'BusStopController'
         }
       }
     });
 
     // if none of the above states are matched, use this as the fallback
-    $urlRouterProvider.otherwise('/signup');
+    $urlRouterProvider.otherwise('/login');
 
 })
 
@@ -259,7 +257,7 @@ angular.module('starter', ['ionic',"firebase"])
 
 .controller('MapController',  ["$scope", '$ionicLoading', '$http', "BusStopJson", 
   function($scope, $ionicLoading, $http, BusStopJson) {                  
-      google.maps.event.addDomListener(window, 'load', function() {
+      
             var myLatlng = new google.maps.LatLng(-23.9343084, -46.3302259);                 
 
             var mapOptions = {
@@ -362,11 +360,11 @@ angular.module('starter', ['ionic',"firebase"])
                             }
                   });            
                   event.preventDefault();
-            });
-      });               
+            });          
 }
 ])
 
 .controller('BusStopController', function($scope, $ionicLoading, $http, BusStopJson) {    
-      $scope.BusStopList = BusStopJson.busStopList;      
+      $scope.BusStopList = BusStopJson.busStopList;
+      //console.log(BusStopJson.busStopList);
 });

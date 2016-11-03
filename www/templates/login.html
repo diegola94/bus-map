@@ -11,15 +11,20 @@
 			</label>
 			
 			<label class="item item-input">
-				  <span class="input-label">Password</span>
-				  <input type="password" name="password" placeholder="Password" ng-model="member.password">
+				  <span class="input-label">Senha</span>
+				  <input type="password" name="password" placeholder="Senha" ng-model="member.password">
 			</label>
-			<div class="padding">
-			  
-			  	<button class="button button-positive col" ng-click="login()">Login</button>
-			  	<br />
-				<a class="left" href="#" ng-click="signup()">Não possui uma conta? Cadastre-se! </a>
-				  				  				  		
+			<div class="padding">			  
+			  	<div class="row padding-vertical">
+			  		<button class="button button-positive col" ng-click="login()">Login</button>			  	
+			  	</div>		
+			  	<div class="row padding-vertical">			  	
+			  		<button class="button button-calm col">Acessar sem login</button>			  		
+			  	</div>
+			  	<div class="row padding-vertical">
+					<!-- <a class="col-center center" ng-click="signup()">Não possui uma conta? Cadastre-se! </a> -->
+					<a class="button icon ion-compose button-clear button-dark col" ng-click="signup()"> &nbsp;Não possui uma conta? Cadastre-se!</a>
+				</div>				  				  				  		
 			  
 				<!--<button class="button button-positive right" ng-click="getuser()">Get User ID</button>								
 					<input type = "text" size="70" ng-model = "user.id"><br><br>
