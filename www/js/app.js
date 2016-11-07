@@ -182,7 +182,7 @@ angular.module('starter', ['ionic',"firebase"])
     			if (user) {
     			  //show user id on screen if signed in
     				$scope.user = {
-    				id: 'User ID: ' + user.uid};aaaaaaaaaa
+    				id: 'User ID: ' + user.uid};
     			} else {
     			  $scope.user = {
     				id: 'no user signed in'};
@@ -371,7 +371,7 @@ angular.module('starter', ['ionic',"firebase"])
                   });            
                   event.preventDefault();
             });          
-}
+  }
 ])
 
 .controller('BusStopController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
@@ -388,12 +388,11 @@ angular.module('starter', ['ionic',"firebase"])
 
       $.each(BusStopJson.busStopList, function() {
           $.each(this.LINHAS, function() {
-                if(!(this.LINHA in $scope.Linhas)){
-                    $scope.Linhas.push(this.LINHA);
-                }
+              if(!(this.LINHA in $scope.Linhas)){
+                  $scope.Linhas.push(this.LINHA);
+              }
           })             
       })
-      console.log($scope.Linhas);      
-
+      console.log($scope.Linhas);
   }
 ]);

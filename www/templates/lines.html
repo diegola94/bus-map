@@ -4,9 +4,9 @@
 		    <input type="text" placeholder="Busca">
 		</label>
         <div class="list">
-		   <a class="item item-avatar"  ng-repeat="Linha in Linhas">
+		   <a class="item item-avatar"  ng-repeat="Linha in Linhas track by $index">
 		      <img src="../img/bus-map-logo.png">
-		      
+		      <h2> LINHA {{ Linha }} </h2>		      
 		    </a>
         </div>
 </ion-list>
