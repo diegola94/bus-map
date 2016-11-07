@@ -5,16 +5,11 @@
 		</label>
         <div class="list">
 		   <a class="item item-avatar"  ng-repeat="BusStop in BusStopList">
-		      <img src="../img/bus-map-logo.png">
+		      <img src="../img/bus-map-icon.jpg">
 		      <h2> {{ BusStop.ADDRESS }} </h2>
 		      <p>
 		      	 <span ng-repeat="LINHA in BusStop.LINHAS"> {{ LINHA.LINHA }} </span>
 		      </p>
 		    </a>
-            <!-- <a class="button button-clear button-dark">		     
-		      <h2><i class="icon ion-location"></i> &nbsp; {{ BusStop.ADDRESS }} <p class="left">LOKO É POKO.</p></h2>
-		      
-		    </a> -->
-          	<!-- <a class="button icon-left ion-location button-clear button-dark"> &nbsp;&nbsp; </a> -->
         </div>
 </ion-list>

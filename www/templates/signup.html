@@ -6,42 +6,30 @@
         
         <ion-content class="has-header">
 					
-		<form name="$parent.userForm">
-			<label class="item item-input">
-			  <span class="input-label">Email</span>
-			  <input type="email" name="email" placeholder="Email" ng-model="member.email" >
-			</label>
-		
-			<label class="item item-input">
-			  <span class="input-label">Senha</span>
-			  <input type="password" name="password" placeholder="Senha" ng-model="member.password">
-			</label>
-		  
-		  	<label class="item item-input">
-			  <span class="input-label">Confirmar Senha</span>
-			  <input type="password" name="password" placeholder="Confirmar Senha" ng-model="member.password">
-			</label>
-		  
-		</form>
-		<div class="padding row" ng-app="starter" ng-controller="Signup">			
-			<a class="button icon-left ion-chevron-left button-clear button-dark col" ng-click="login()">Voltar</a>
-			<button class="button button-positive col"  ng-click="createUser()">
-				Cadastrar
-			</button>
-		
-			<!-- <p ng-if="message">Message: <strong>{{ message }}</strong></p>
-			<p ng-if="error">Error: <strong>{{ error }}</strong></p> -->
-		</div>
+			<form name="$parent.userForm">
+				<label class="item item-input">
+				  <span class="input-label">Email</span>
+				  <input type="email" name="email" placeholder="Email" ng-model="member.email" >
+				</label>
+			
+				<label class="item item-input">
+				  <span class="input-label">Senha</span>
+				  <input type="password" name="password" placeholder="Senha" ng-model="member.password">
+				</label>
+			  
+			  	<label class="item item-input">
+				  <span class="input-label">Confirmar Senha</span>
+				  <input type="password" name="password" placeholder="Confirmar Senha" ng-model="member.password">
+				</label>
+			  
+			</form>
+			<div class="padding row" ng-app="starter" ng-controller="Signup">			
+				<a class="button icon-left ion-chevron-left button-clear button-dark col" ng-click="login()">Voltar</a>
+				<button class="button button-positive col"  ng-click="createUser()">
+					Cadastrar
+				</button>
+			</div>
 
-			
-	    </ion-content>
-		
-<!--    <ion-footer-bar align-title="left" class="bar-positive ">
-		<div class="button-bar ">
-		  <a class="button button-clear" ng-click="signup()">Sign up</a>
-		  <a class="button button-clear" ng-click="login()">Login</a>
-		  <a class="button button-clear" ng-click="db_connect()">DB Connector</a>
-		</div> 
-			
-		</ion-footer-bar>-->
+	    </ion-content>	
+
     </ion-view> 

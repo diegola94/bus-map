@@ -102,6 +102,16 @@ angular.module('starter', ['ionic',"firebase"])
           controller: 'BusStopController'
         }
       }
+    })
+
+    .state('tabs.lines', {
+      url: "/lines",
+      views: {
+        'lines-tab': {
+          templateUrl: "templates/lines.html",
+          controller: 'LinesController'
+        }
+      }
     });
 
     // if none of the above states are matched, use this as the fallback
@@ -331,7 +341,7 @@ angular.module('starter', ['ionic',"firebase"])
             });                                           
 
             $scope.map = map;
-            // Teste            
+           
             var originAddress = (document.getElementById('txtOrigin'));            ;
             var destinationAddress = (document.getElementById('txtDestination'));
 
@@ -364,7 +374,26 @@ angular.module('starter', ['ionic',"firebase"])
 }
 ])
 
-.controller('BusStopController', function($scope, $ionicLoading, $http, BusStopJson) {    
-      $scope.BusStopList = BusStopJson.busStopList;
-      //console.log(BusStopJson.busStopList);
-});
+.controller('BusStopController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
+  function($scope, $ionicLoading, $http, BusStopJson) {    
+      $scope.BusStopList = BusStopJson.busStopList;    
+  }
+])
+
+.controller('LinesController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
+  function($scope, $ionicLoading, $http, BusStopJson) {    
+      $scope.BusStopList = BusStopJson.busStopList;    
+
+      $scope.Linhas = [];
+
+      $.each(BusStopJson.busStopList, function() {
+          $.each(this.LINHAS, function() {
+                if(!(this.LINHA in $scope.Linhas)){
+                    $scope.Linhas.push(this.LINHA);
+                }
+          })             
+      })
+      console.log($scope.Linhas);      
+
+  }
+]);
