@@ -112,6 +112,26 @@ angular.module('starter', ['ionic',"firebase"])
           controller: 'LinesController'
         }
       }
+    })
+
+    .state('tabs.favorites', {
+      url: "/favorites",
+      views: {
+        'favorites-tab': {
+          templateUrl: "templates/favorites.html",
+          controller: 'FavoritesController'
+        }
+      }
+    })
+
+    .state('tabs.historic', {
+      url: "/historic",
+      views: {
+        'historic-tab': {
+          templateUrl: "templates/historic.html",
+          controller: 'HistoricController'
+        }
+      }
     });
 
     // if none of the above states are matched, use this as the fallback
@@ -235,18 +255,18 @@ angular.module('starter', ['ionic',"firebase"])
     		$password_str = $scope.userForm.password.$modelValue;
      
         if ($email_str === undefined || $email_str === "" || $email_str === null) {
-          alert("Email inválido.");
+            alert("Email inválido.");
         } 
         else if ($password_str === undefined || $password_str === "" || $password_str === null) {
-          alert("Preecha o campo senha.");
+            alert("Preecha o campo senha.");
         } else {
-          // Create a new user
-          Auth.$createUserWithEmailAndPassword($email_str, $password_str)
-            .then(function(firebaseUser) {
-              $scope.message = "User created with uid: " + firebaseUser.uid;
-            }).catch(function(error) {
-              alert(error.message);
-              $scope.error = error;
+            // Create a new user
+            Auth.$createUserWithEmailAndPassword($email_str, $password_str)
+              .then(function(firebaseUser) {
+                $scope.message = "User created with uid: " + firebaseUser.uid;
+              }).catch(function(error) {
+                alert(error.message);
+                $scope.error = error;
             });
         }
       };
@@ -267,8 +287,8 @@ angular.module('starter', ['ionic',"firebase"])
 
 .controller('MapController',  ["$scope", '$ionicLoading', '$http', "BusStopJson", 
   function($scope, $ionicLoading, $http, BusStopJson) {                  
-      
-            var myLatlng = new google.maps.LatLng(-23.9343084, -46.3302259);                 
+            var markersArray = [];
+            var myLatlng = new google.maps.LatLng(-23.9804479, -46.3109819);                 
 
             var mapOptions = {
                 center: myLatlng,
@@ -289,56 +309,74 @@ angular.module('starter', ['ionic',"firebase"])
      
             directionsDisplay.setMap(map);
 
-            navigator.geolocation.getCurrentPosition(function(pos) {
-                map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-                var myLocation = new google.maps.Marker({
-                    position: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
+            var myLocation = new google.maps.Marker({
+                    position: myLatlng,
                     map: map,                
                     title: "Você",
                     icon: 'img/icon-you-here.png'
-                });
             });
+
+            // navigator.geolocation.getCurrentPosition(function(pos) {
+            //     map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+            //     var myLocation = new google.maps.Marker({
+            //         position: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
+            //         map: map,                
+            //         title: "Você",
+            //         icon: 'img/icon-you-here.png'
+            //     });
+            // });
 
             var allInfoWindows = [];                          
      
-            $.each( BusStopJson.busStopList, function() {                
-                  var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);
+            $("#show-pin").change(function() {
+                if(this.checked) {
+                    $.each( BusStopJson.busStopList, function() {                
+                          var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);
 
-                  var linhas = "";
+                          var linhas = "";
 
-                  $.each( this.LINHAS, function() {
-                        linhas += this.LINHA + ", ";
-                  })  
-                  linhas = linhas.substring(0, linhas.length - 2);
+                          $.each( this.LINHAS, function() {
+                                linhas += this.LINHA + ", ";
+                          })  
+                          linhas = linhas.substring(0, linhas.length - 2);
 
-                  var contentString = 
-                        '<div>'+                      
-                          '<h4>Ponto de Onibus</h4>'+
-                          '<div id="bodyContent">'+
-                              'Endereço: ' + this.ADDRESS + 
-                              '<br /> Linhas que passam neste ponto: ' + linhas +                            
-                          '</div>'+
-                        '</div>';
-                                    
-                  var infowindow = new google.maps.InfoWindow({
-                        content: contentString
-                  });
+                          var contentString = 
+                                '<div>'+                      
+                                  '<h4>Ponto de Onibus</h4>'+
+                                  '<div id="bodyContent">'+
+                                      'Endereço: ' + this.ADDRESS + 
+                                      '<br /> Linhas que passam neste ponto: ' + linhas +                            
+                                  '</div>'+
+                                '</div>';
+                                            
+                          var infowindow = new google.maps.InfoWindow({
+                                content: contentString
+                          });
 
-                  allInfoWindows.push(infowindow);
+                          allInfoWindows.push(infowindow);
 
-                  var marker = new google.maps.Marker({
-                        position: myLatlng,
-                        map: map,
-                        icon: 'img/icon-bus-stop.png'
-                  });                              
+                          var marker = new google.maps.Marker({
+                                position: myLatlng,
+                                map: map,
+                                icon: 'img/icon-bus-stop.png'
+                          });                              
+                          
+                          markersArray.push(marker);
 
-                  marker.addListener('click', function() {                  
-                    for (var i=0;i<allInfoWindows.length;i++) {
-                        allInfoWindows[i].close();
-                    }
-                    infowindow.open(map, marker);
-                  });              
-            });                                           
+                          marker.addListener('click', function() {                                              
+                              for (var i=0;i<allInfoWindows.length;i++) 
+                                  allInfoWindows[i].close();
+                              
+                              infowindow.open(map, marker);
+                          });              
+                    });                                           
+                } else {
+                      for (var i = 0; i < markersArray.length; i++ ) 
+                        markersArray[i].setMap(null);
+                      
+                      markersArray.length = 0;
+                }
+            });                        
 
             $scope.map = map;
            
@@ -376,23 +414,36 @@ angular.module('starter', ['ionic',"firebase"])
 
 .controller('BusStopController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
   function($scope, $ionicLoading, $http, BusStopJson) {    
-      $scope.BusStopList = BusStopJson.busStopList;    
+        $scope.BusStopList = BusStopJson.busStopList;    
   }
 ])
 
 .controller('LinesController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
   function($scope, $ionicLoading, $http, BusStopJson) {    
-      $scope.BusStopList = BusStopJson.busStopList;    
+        $scope.BusStopList = BusStopJson.busStopList;    
 
-      $scope.Linhas = [];
+        $scope.Linhas = [];
 
-      $.each(BusStopJson.busStopList, function() {
-          $.each(this.LINHAS, function() {
-              if(!(this.LINHA in $scope.Linhas)){
-                  $scope.Linhas.push(this.LINHA);
-              }
-          })             
-      })
-      console.log($scope.Linhas);
+        $.each(BusStopJson.busStopList, function() {
+            $.each(this.LINHAS, function() {                
+                if($.inArray(this.LINHA,$scope.Linhas) == -1){
+                    $scope.Linhas.push(this.LINHA);                  
+                }
+            })
+        })
+        $scope.Linhas.sort(function(a, b){return a-b});
+        
+  }
+])
+
+.controller('FavoritesController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
+  function($scope, $ionicLoading, $http, BusStopJson) {    
+      
+  }
+])
+
+.controller('HistoricController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
+  function($scope, $ionicLoading, $http, BusStopJson) {    
+
   }
 ]);

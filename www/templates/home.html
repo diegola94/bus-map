@@ -9,10 +9,12 @@
                     <i class="icon ion-search placeholder-icon"></i>
                     <input type="search" id="txtDestination" placeholder="Destino">
                 </label>
-
-                <ion-checkbox> Mostrar todos os pontos </ion-checkbox>
+                <p class="item item-input bm-search bm-checkbox">
+                    <input type="checkbox" id="show-pin" />
+                    <label for="show-pin">Mostrar todos os pontos</label>
+                </p>
                 
-                <input type="submit" value="Busca">
+                <!-- <input type="submit" value="Busca"> -->
             </form>
             
             <div id="map" data-tap-disabled="true"></div>            

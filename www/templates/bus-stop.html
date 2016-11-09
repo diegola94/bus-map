@@ -4,12 +4,15 @@
 		    <input type="text" placeholder="Busca">
 		</label>
         <div class="list">
-		   <a class="item item-avatar"  ng-repeat="BusStop in BusStopList">
+		   <a class="item item-avatar item-button-right"  ng-repeat="BusStop in BusStopList">
 		      <img src="../img/bus-map-icon.jpg">
-		      <h2> {{ BusStop.ADDRESS }} </h2>
-		      <p>
-		      	 <span ng-repeat="LINHA in BusStop.LINHAS"> {{ LINHA.LINHA }} </span>
-		      </p>
-		    </a>
+		      <div style="display: block; float: left; ">
+			      <h2> {{ BusStop.ADDRESS }} </h2>
+			      <p>
+			      	 <span ng-repeat="LINHA in BusStop.LINHAS"> {{ LINHA.LINHA }} </span>
+			      </p>
+		      </div>
+		      <button class="button button-positive button-list"> <i class="icon ion-ios-information-outline"></i></button>
+		   </a>
         </div>
 </ion-list>
