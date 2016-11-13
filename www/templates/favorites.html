@@ -1,33 +1,40 @@
-<ion-list>
-		<div class="bar bar-header item-input-inset">
-			  <label class="item-input-wrapper">		    
-			    <input type="search" placeholder="Favorito">
-			  </label>
-			  <button class="button button-positive">
-			    <i class="icon ion-plus-circled"></i> Adicionar
-			  </button>		  	 
-		</div>
+<ion-view view-title="Favoritos">
+    <ion-content class="has-bottom">
+		<ion-list>
+				<label class="item item-input">
+				    <i class="icon ion-search placeholder-icon"></i>
+				    <input type="text" placeholder="Busca">
+				</label>
+				<div class="list">
+		        		<div class="item item-avatar item-button-right">
+				      		<img src="../img/bus-map-icon-star.jpg">
+				      		<p>Casa</p>
+				      		<span>Av. Ana Costa 398</span>		      		
+				      		<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button> -->
+				      		<a class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear"></a>
+				    	</div>
 
-		<div class="list">
-        		<div class="item item-avatar item-button-right">
-		      		<img src="../img/bus-map-icon-star.jpg">
-		      		<span class="span-list">Av. Ana Costa 398</span>		      		
-		      		<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button> -->
-		      		<a class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear"></a>
-		    	</div>
+				    	<div class="item item-avatar item-button-right">
+				      		<img src="../img/bus-map-icon-star.jpg">
+				      		<p>Trabalho</p>
+				      		<span>Av. Conselheiro Nébias 348</span>
+				      		<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button> -->
+				      		<a class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear"></a>
+				    	</div>
 
-		    	<div class="item item-avatar item-button-right">
-		      		<img src="../img/bus-map-icon-star.jpg">
-		      		<span class="span-list">Av. Conselheiro Nébias 348</span>
-		      		<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button> -->
-		      		<a class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear"></a>
-		    	</div>
-
-		    	<div class="item item-avatar item-button-right">
-		      		<img src="../img/bus-map-icon-star.jpg">
-		      		<span class="span-list">Rua Vivaldo de Almeida Nery 18</span>
-		      		<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button> -->
-		      		<a class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear"></a>
-		    	</div>
-       	</div>
-</ion-list>
+				    	<div class="item item-avatar item-button-right">
+				      		<img src="../img/bus-map-icon-star.jpg">
+				      		<p>Escola</p>
+				      		<span>Rua Vivaldo de Almeida Nery 18</span>
+				      		<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button> -->
+				      		<a class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear"></a>
+				    	</div>
+		       	</div>
+		</ion-list>						
+	</ion-content>
+	<div class="fixed-footer">
+		<button class="button icon-left ion-log-out button-assertive button-logout" ng-click="signout()"> Sair </button>		
+		<button class="button button-positive button-add-fav" ng-click="showPopup()"> <i class="icon ion-ios-plus-outline"></i> Novo favorito</button>
+	</div>
+</ion-view>
+    

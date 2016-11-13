@@ -1,5 +1,5 @@
 <ion-view view-title="Home">
-        <ion-content>
+        <ion-content class="has-bottom">
             <form id="calcRouteForm">
                 <label class="item item-input bm-search bm-ida">
                     <i class="icon ion-search placeholder-icon"></i>
@@ -17,7 +17,9 @@
                 <!-- <input type="submit" value="Busca"> -->
             </form>
             
-            <div id="map" data-tap-disabled="true"></div>            
-        
+            <div id="map" data-tap-disabled="true"></div>                        
         </ion-content>
+        <div class="fixed-footer">
+            <button class="button icon-left ion-log-out button-assertive button-logout" ng-click="signout()"> Sair </button>        
+        </div>
 </ion-view>

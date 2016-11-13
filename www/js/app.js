@@ -24,7 +24,32 @@ angular.module('starter', ['ionic',"firebase"])
     };
 })
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $rootScope, $state, $ionicPopup) {
+  $rootScope.signout = function() {
+     firebase.auth().signOut().then(function() {
+        $rootScope.showConfirm();                    
+     })
+
+    .catch(function(error) {              
+      alert(error.message);
+    });
+  }
+
+  $rootScope.showConfirm = function() {
+     var confirmPopup = $ionicPopup.confirm({
+       title: 'Sair',
+       template: 'Você tem certeza que deseja sair?'
+     });
+
+     confirmPopup.then(function(res) {
+       if(res) {
+         $state.go('login');
+       } else {
+         //console.log('You are not sure');
+       }
+     });
+   };
+
   $ionicPlatform.ready(function() {
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -152,7 +177,7 @@ angular.module('starter', ['ionic',"firebase"])
     		firebase.database().ref($refpath).set({
     			data1: $data1,
     			data2: $data2,
-    			data3 : $data3
+    			data3: $data3
     		}).then(function() {
              alert("Data submitted");
             })
@@ -184,15 +209,7 @@ angular.module('starter', ['ionic',"firebase"])
     	//go to db tab
     	$scope.db_connect = function() {
            $state.go('db_connect');
-    	}
-    	$scope.signout = function() {
-         firebase.auth().signOut().then(function() {
-             alert("Signed out successfully");
-            })
-    		.catch(function(error) {      		    
-    			alert(error.message);
-        });
-      }
+    	}    	
     	
       $scope.getuser = function() {
          
@@ -436,10 +453,50 @@ angular.module('starter', ['ionic',"firebase"])
   }
 ])
 
-.controller('FavoritesController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
-  function($scope, $ionicLoading, $http, BusStopJson) {    
-      
-  }
+.controller('FavoritesController', ["$scope", '$ionicLoading', '$ionicPopup', '$http', "BusStopJson", 
+  function($scope, $ionicLoading, $ionicPopup, $http, BusStopJson) {    
+      // Triggered on a button click, or some other target
+      $scope.showPopup = function() {
+        $scope.data = {}
+
+        var favHtml = ' <div class="list">'
+                      + '  <label class="item item-input item-stacked-label">'
+                      + '    <span class="input-label">Apelido para rota</span>'
+                      + '    <input type="text" placeholder="Casa">'
+                      + '  </label>'
+                      + '  <label class="item item-input item-stacked-label">'
+                      + '    <span class="input-label">Rota</span>'
+                      + '    <input type="text" placeholder="Av. Ana Costa 209">'
+                      + '  </label>  '
+                      + '</div>'
+                      
+
+         // An elaborate, custom popup
+        var myPopup = $ionicPopup.show({
+           template: '<input type="password" ng-model="data.wifi" placeholder="Apelido para Rota"><br /><input type="password" ng-model="data.rota" placeholder="Rota">',
+           title: 'Adicionar nova rota favorito',
+           subTitle: '',
+           scope: $scope,
+           buttons: [
+             { text: 'Cancelar' },
+             {
+               text: '<b>Salvar</b>',
+               type: 'button-positive',
+               onTap: function(e) {
+                 if (!$scope.data.wifi) {
+                   //don't allow the user to close unless he enters wifi password
+                   e.preventDefault();
+                 } else {
+                   return $scope.data.wifi;
+                 }
+               }
+             },
+           ]
+        });                 
+         
+
+      };
+      }
 ])
 
 .controller('HistoricController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
