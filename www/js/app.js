@@ -455,7 +455,29 @@ angular.module('starter', ['ionic',"firebase"])
 
 .controller('FavoritesController', ["$scope", '$ionicLoading', '$ionicPopup', '$http', "BusStopJson", 
   function($scope, $ionicLoading, $ionicPopup, $http, BusStopJson) {    
-      // Triggered on a button click, or some other target
+      
+        var templateElemento = '<div class="item item-avatar item-button-right">'
+                             + '<img src="../img/bus-map-icon-star.jpg">'
+                             + '<p>#apelido#</p>'
+                             + '<span>#rota#</span>'
+                             + '<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button>-->'
+                             + '<a class="delelarFavorito" data-index="#index#" onClick="reply_click()" class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear"></a>'
+                             + '</div>'
+        var ElementoListaFavoritos = angular.element( document.querySelector( '#listaFavoritos' ) );
+        var Storagefavoritos = JSON.parse(localStorage.getItem("favoritos"));
+
+        for (i in Storagefavoritos)
+        {
+          var elemento = templateElemento.replace("#index#",i).replace("#apelido#",Storagefavoritos[i].apelido).replace("#rota#",Storagefavoritos[i].rota);
+          ElementoListaFavoritos.append(elemento);
+        }
+
+       function reply_click(clicked_id)
+       {
+          alert(clicked_id);
+       }
+
+
       $scope.showPopup = function() {
         $scope.data = {}
 
@@ -472,8 +494,8 @@ angular.module('starter', ['ionic',"firebase"])
                       
 
          // An elaborate, custom popup
-        var myPopup = $ionicPopup.show({
-           template: '<input type="password" ng-model="data.wifi" placeholder="Apelido para Rota"><br /><input type="password" ng-model="data.rota" placeholder="Rota">',
+           var myPopup = $ionicPopup.show({
+           template: '<input type="text" ng-model="data.apelido" placeholder="Apelido para Rota"><br /><input type="text" ng-model="data.rota" placeholder="Rota">',
            title: 'Adicionar nova rota favorito',
            subTitle: '',
            scope: $scope,
@@ -483,20 +505,35 @@ angular.module('starter', ['ionic',"firebase"])
                text: '<b>Salvar</b>',
                type: 'button-positive',
                onTap: function(e) {
-                 if (!$scope.data.wifi) {
+                 if (!$scope.data.apelido) {
                    //don't allow the user to close unless he enters wifi password
                    e.preventDefault();
                  } else {
-                   return $scope.data.wifi;
+                   return $scope.data.apelido;
                  }
                }
-             },
-           ]
-        });                 
-         
-
-      };
-      }
+             },]
+          });                 
+      
+          myPopup.then(function(res) {
+              if (res) {
+                var Storagefavoritos = [];
+                Storagefavoritos = JSON.parse(localStorage.getItem("favoritos"));
+                if(Storagefavoritos == null || Storagefavoritos == undefined){
+                  Storagefavoritos = [];
+                }
+                var favorito = {
+                    apelido:$scope.data.apelido,
+                    rota:$scope.data.rota
+                  };
+                console.log(favorito);
+                Storagefavoritos.push(favorito);
+                localStorage.setItem("favoritos", JSON.stringify(Storagefavoritos));
+                location.reload();
+              }
+          });
+    }
+  }   
 ])
 
 .controller('HistoricController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
