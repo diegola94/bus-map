@@ -333,6 +333,10 @@ angular.module('starter', ['ionic',"firebase"])
                     icon: 'img/icon-you-here.png'
             });
 
+            $scope.map = map;
+
+
+
             // navigator.geolocation.getCurrentPosition(function(pos) {
             //     map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
             //     var myLocation = new google.maps.Marker({
@@ -342,6 +346,9 @@ angular.module('starter', ['ionic',"firebase"])
             //         icon: 'img/icon-you-here.png'
             //     });
             // });
+
+            
+
 
             var allInfoWindows = [];                          
      
@@ -394,8 +401,6 @@ angular.module('starter', ['ionic',"firebase"])
                       markersArray.length = 0;
                 }
             });                        
-
-            $scope.map = map;
            
             var originAddress = (document.getElementById('txtOrigin'));            ;
             var destinationAddress = (document.getElementById('txtDestination'));
@@ -424,6 +429,22 @@ angular.module('starter', ['ionic',"firebase"])
                                 window.alert('Directions request failed due to ' + status);
                             }
                   });            
+
+                  if( (document.getElementById('txtOrigin').value != null || document.getElementById('txtOrigin').value != undefined )  && (document.getElementById('txtDestination').value != null || document.getElementById('txtDestination').value != undefined )){
+                     var StorageHistorico = [];
+                     StorageHistorico = JSON.parse(localStorage.getItem("historico"));
+                      if(StorageHistorico == null || StorageHistorico == undefined){
+                        StorageHistorico = [];
+                      }
+                    var historico = {
+                    origem:document.getElementById('txtOrigin').value,
+                    destino:document.getElementById('txtDestination').value
+                  };
+                
+                  StorageHistorico.push(historico);
+                  localStorage.setItem("historico", JSON.stringify(StorageHistorico));
+
+                  }
                   event.preventDefault();
             });          
   }
@@ -432,14 +453,103 @@ angular.module('starter', ['ionic',"firebase"])
 .controller('BusStopController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
   function($scope, $ionicLoading, $http, BusStopJson) {    
         $scope.BusStopList = BusStopJson.busStopList;    
+
+        $("#mapBusStop").hide();
+        $("#busStopMap").hide();
+
+        var allInfoWindows = [];
+
+        $scope.showMap = function(busStop) {            
+            $("#listBusStop").hide();
+            $("#mapBusStop").show();
+            $("#busStopMap").show();
+
+            console.log(busStop.BusStop);
+            var markersArray = [];
+            var myLatlng = new google.maps.LatLng(-23.9804479, -46.3109819);                 
+
+            var mapOptions = {
+                center: new google.maps.LatLng(busStop.BusStop.COORDINATEY, busStop.BusStop.COORDINATEX),
+                zoom: 16,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,         
+                mapTypeControl: false,
+                styles: [{
+                  featureType: "transit.station.bus",
+                  stylers: [
+                    { visibility: "off" }
+                  ]
+                }]
+            };
+            
+            var directionsService = new google.maps.DirectionsService;
+            var directionsDisplay = new google.maps.DirectionsRenderer;                 
+            var map = new google.maps.Map(document.getElementById("busStopMap"), mapOptions);
+     
+            directionsDisplay.setMap(map);
+
+            var myLocation = new google.maps.Marker({
+                    position: myLatlng,
+                    map: map,                
+                    title: "Você",
+                    icon: 'img/icon-you-here.png'
+            });
+
+            $scope.map = map;  
+            
+            console.log($scope.PinnedLinhas);
+
+            var myLatlng = new google.maps.LatLng(busStop.BusStop.COORDINATEY, busStop.BusStop.COORDINATEX);
+
+            var linhas = "";
+
+            $.each( busStop.BusStop.LINHAS, function() {
+                  linhas += this.LINHA + ", ";
+            })  
+            linhas = linhas.substring(0, linhas.length - 2);
+
+            var contentString = 
+                  '<div>'+                      
+                    '<h4>Ponto de Onibus</h4>'+
+                    '<div id="bodyContent">'+
+                        'Endereço: ' + busStop.BusStop.ADDRESS + 
+                        '<br /> Linhas que passam neste ponto: ' + linhas +                            
+                    '</div>'+
+                  '</div>';
+                              
+            var infowindow = new google.maps.InfoWindow({
+                  content: contentString
+            });
+
+            allInfoWindows.push(infowindow);
+
+            var marker = new google.maps.Marker({
+                  position: myLatlng,
+                  map: map,
+                  icon: 'img/icon-bus-stop.png'
+            });                              
+            
+            markersArray.push(marker);
+            infowindow.open(map, marker);          
+        }
+
+
+        $scope.hideMap = function() {
+            $("#listBusStop").show();
+            $("#mapBusStop").hide();
+            $("#busStopMap").hide();
+        }
   }
 ])
 
 .controller('LinesController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
   function($scope, $ionicLoading, $http, BusStopJson) {    
-        $scope.BusStopList = BusStopJson.busStopList;    
 
+        $("#mapLines").hide();
+        $("#linesMap").hide();
+
+        $scope.BusStopList = BusStopJson.busStopList;    
         $scope.Linhas = [];
+        $scope.PinnedLinhas = [];
 
         $.each(BusStopJson.busStopList, function() {
             $.each(this.LINHAS, function() {                
@@ -448,34 +558,134 @@ angular.module('starter', ['ionic',"firebase"])
                 }
             })
         })
-        $scope.Linhas.sort(function(a, b){return a-b});
-        
+        $scope.Linhas.sort();
+
+        $scope.showMap = function(line) {
+            $("#listLines").hide();
+            $("#mapLines").show();
+            $("#linesMap").show();
+
+            $scope.PinnedLinhas = [];
+            var markersArray = [];
+
+
+            $.each(BusStopJson.busStopList, function() {
+                var busStops = this;
+
+                $.each(this.LINHAS, function() {                
+                    if(this.LINHA == line.Linha){
+                        $scope.PinnedLinhas.push(busStops);
+                    }
+                })
+            })
+
+            var myLatlng = new google.maps.LatLng(-23.9804479, -46.3109819);                 
+
+            var mapOptions = {
+                center: new google.maps.LatLng($scope.PinnedLinhas[0].COORDINATEY, $scope.PinnedLinhas[0].COORDINATEX),
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,         
+                mapTypeControl: false,
+                styles: [{
+                  featureType: "transit.station.bus",
+                  stylers: [
+                    { visibility: "off" }
+                  ]
+                }]
+            };
+            
+            var directionsService = new google.maps.DirectionsService;
+            var directionsDisplay = new google.maps.DirectionsRenderer;                 
+            var map = new google.maps.Map(document.getElementById("linesMap"), mapOptions);
+     
+            directionsDisplay.setMap(map);
+
+            var myLocation = new google.maps.Marker({
+                    position: myLatlng,
+                    map: map,                
+                    title: "Você",
+                    icon: 'img/icon-you-here.png'
+            });
+
+            $scope.map = map;
+                      
+
+            var allInfoWindows = [];         
+            $.each( $scope.PinnedLinhas, function() {                
+                var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);
+
+                var linhas = "";
+
+                $.each( this.LINHAS, function() {
+                      linhas += this.LINHA + ", ";
+                })  
+                linhas = linhas.substring(0, linhas.length - 2);
+
+                var contentString = 
+                      '<div>'+                      
+                        '<h4>Ponto de Onibus</h4>'+
+                        '<div id="bodyContent">'+
+                            'Endereço: ' + this.ADDRESS + 
+                            '<br /> Linhas que passam neste ponto: ' + linhas +                            
+                        '</div>'+
+                      '</div>';
+                                  
+                var infowindow = new google.maps.InfoWindow({
+                      content: contentString
+                });
+
+                allInfoWindows.push(infowindow);
+
+                var marker = new google.maps.Marker({
+                      position: myLatlng,
+                      map: map,
+                      icon: 'img/icon-bus-stop.png'
+                });                              
+                
+                markersArray.push(marker);
+
+                marker.addListener('click', function() {                                              
+                    for (var i=0;i<allInfoWindows.length;i++) 
+                        allInfoWindows[i].close();
+                    
+                    infowindow.open(map, marker);
+                });
+
+            })
+        }                  
+
+        $scope.hideMap = function() {
+            $("#listLines").show();
+            $("#mapLines").hide();
+            $("#linesMap").hide();
+        }
   }
 ])
 
 .controller('FavoritesController', ["$scope", '$ionicLoading', '$ionicPopup', '$http', "BusStopJson", 
   function($scope, $ionicLoading, $ionicPopup, $http, BusStopJson) {    
       
-        var templateElemento = '<div class="item item-avatar item-button-right">'
-                             + '<img src="../img/bus-map-icon-star.jpg">'
-                             + '<p>#apelido#</p>'
-                             + '<span>#rota#</span>'
-                             + '<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button>-->'
-                             + '<a class="delelarFavorito" data-index="#index#" onClick="reply_click()" class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear"></a>'
-                             + '</div>'
-        var ElementoListaFavoritos = angular.element( document.querySelector( '#listaFavoritos' ) );
-        var Storagefavoritos = JSON.parse(localStorage.getItem("favoritos"));
 
-        for (i in Storagefavoritos)
-        {
-          var elemento = templateElemento.replace("#index#",i).replace("#apelido#",Storagefavoritos[i].apelido).replace("#rota#",Storagefavoritos[i].rota);
-          ElementoListaFavoritos.append(elemento);
-        }
-
-       function reply_click(clicked_id)
-       {
-          alert(clicked_id);
+       $scope.reply_click = function() {
+          console.log('bla');
        }
+
+      var templateElemento = '<div class="item item-avatar item-button-right">'
+                           + '<img src="../img/bus-map-icon-star.jpg">'
+                           + '<p>#apelido#</p>'
+                           + '<span>#rota#</span>'
+                           + '<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button>-->'
+                           + '<button data-index="#index#" ng-click="reply_click()" class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear"></button>'
+                           + '</div>'
+      var ElementoListaFavoritos = angular.element( document.querySelector( '#listaFavoritos' ) );
+      var Storagefavoritos = JSON.parse(localStorage.getItem("favoritos"));
+
+      for (i in Storagefavoritos)
+      {
+        var elemento = templateElemento.replace("#index#",i).replace("#apelido#",Storagefavoritos[i].apelido).replace("#rota#",Storagefavoritos[i].rota);
+        ElementoListaFavoritos.append(elemento);
+      }
+
 
 
       $scope.showPopup = function() {
@@ -526,7 +736,7 @@ angular.module('starter', ['ionic',"firebase"])
                     apelido:$scope.data.apelido,
                     rota:$scope.data.rota
                   };
-                console.log(favorito);
+                
                 Storagefavoritos.push(favorito);
                 localStorage.setItem("favoritos", JSON.stringify(Storagefavoritos));
                 location.reload();
@@ -539,5 +749,20 @@ angular.module('starter', ['ionic',"firebase"])
 .controller('HistoricController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
   function($scope, $ionicLoading, $http, BusStopJson) {    
 
+      var templateElemento = '<div class="item item-avatar item-button-right">'
+                           + '<img src="../img/bus-map-icon-historic.jpg">'
+                           + '<span>#origem#</span><br />'
+                           + '<span class="span-list">#destino#</span>'
+                           + '<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button> -->'
+                           + '<button class="button button-positive button-list"> <i class="icon ion-android-refresh"></i></button>'
+                           + '</div>'
+      var ElementoListaHistorico = angular.element( document.querySelector( '#listaHistorico' ) );
+      var StorageHistorico = JSON.parse(localStorage.getItem("historico"));
+
+      for (i in StorageHistorico)
+      {
+        var elemento = templateElemento.replace("#origem#",StorageHistorico[i].origem).replace("#destino#",StorageHistorico[i].destino);
+        ElementoListaHistorico.append(elemento);
+      }
   }
 ]);

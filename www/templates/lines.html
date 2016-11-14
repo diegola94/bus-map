@@ -1,6 +1,6 @@
 <ion-view view-title="Linhas">
     <ion-content class="has-bottom">
-		<ion-list>
+		<ion-list id="listLines">
 				<label class="item item-input">
 				    <i class="icon ion-search placeholder-icon"></i>
 				    <input type="text" placeholder="Busca">
@@ -9,10 +9,14 @@
 		        	<div class="item item-avatar item-button-right" ng-repeat="Linha in Linhas track by $index">		   		
 				      	<img src="../img/bus-map-icon-line.jpg">
 				      	<span class="span-list">LINHA {{ Linha }}</span>
-				      	<button class="button button-positive button-list"> <i class="icon ion-android-globe"></i></button>
+				      	<button class="button button-positive button-list" ng-click="showMap(this)"> <i class="icon ion-android-globe"></i></button>
 				    </div>
 		        </div>
 		</ion-list>		
+		<div id="mapLines">            
+            <button class="button icon-left ion-ios-arrow-back button-positive button-back" ng-click="hideMap()"> Voltar </button>
+        </div>
+        <div id="linesMap" class="map" data-tap-disabled="true"></div>
 	</ion-content>
 	<div class="fixed-footer">
 		<button class="button icon-left ion-log-out button-assertive button-logout" ng-click="signout()"> Sair </button>		
