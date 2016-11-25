@@ -26,13 +26,7 @@ angular.module('starter', ['ionic',"firebase"])
 
 .run(function($ionicPlatform, $rootScope, $state, $ionicPopup) {
   $rootScope.signout = function() {
-     firebase.auth().signOut().then(function() {
-        $rootScope.showConfirm();                    
-     })
-
-    .catch(function(error) {              
-      alert(error.message);
-    });
+    $rootScope.showConfirm();
   }
 
   $rootScope.showConfirm = function() {
@@ -43,12 +37,26 @@ angular.module('starter', ['ionic',"firebase"])
 
      confirmPopup.then(function(res) {
        if(res) {
-         $state.go('login');
+          $state.go('login');
+          firebase.auth().signOut();          
        } else {
          //console.log('You are not sure');
        }
      });
-   };
+  };
+
+  $rootScope.isConnected = function() {
+        //get current user if signed in
+        var user = firebase.auth().currentUser;
+        //console.log(user != null);        
+        if(user){ 
+          return "ng-show";
+        } else {
+          return "ng-hide";
+        }
+
+        
+  };
 
   $ionicPlatform.ready(function() {
     if(window.cordova && window.cordova.plugins.Keyboard) {
@@ -211,19 +219,17 @@ angular.module('starter', ['ionic',"firebase"])
            $state.go('db_connect');
     	}    	
     	
-      $scope.getuser = function() {
-         
-    	    //get current user if signed in
-          var user = firebase.auth().currentUser;
+        $scope.getuser = function() {
+           
+      	    //get current user if signed in
+            var user = firebase.auth().currentUser;
 
-    			if (user) {
-    			  //show user id on screen if signed in
-    				$scope.user = {
-    				id: 'User ID: ' + user.uid};
-    			} else {
-    			  $scope.user = {
-    				id: 'no user signed in'};
-    			}      			 
+      			if (user) {
+      			  //show user id on screen if signed in
+      				$scope.user = { id: user.uid };
+      			} else {
+      			  $scope.user = { id: '' };
+      		  }      			 
     	
       }
     	
@@ -250,7 +256,11 @@ angular.module('starter', ['ionic',"firebase"])
                       //$scope.error = error;
               });
           }      
-      }	       
+      }
+
+      $scope.semLogin = function() {             
+          $state.go('tabs.home');
+      }      
 }])
   
 .controller("Signup",  ["$scope", "Auth",'$state',
@@ -454,15 +464,11 @@ angular.module('starter', ['ionic',"firebase"])
   function($scope, $ionicLoading, $http, BusStopJson) {    
         $scope.BusStopList = BusStopJson.busStopList;    
 
-        $("#mapBusStop").hide();
-        $("#busStopMap").hide();
-
         var allInfoWindows = [];
+        $scope.showMapBusStop = false;
 
         $scope.showMap = function(busStop) {            
-            $("#listBusStop").hide();
-            $("#mapBusStop").show();
-            $("#busStopMap").show();
+            $scope.showMapBusStop = true;
 
             console.log(busStop.BusStop);
             var markersArray = [];
@@ -534,9 +540,30 @@ angular.module('starter', ['ionic',"firebase"])
 
 
         $scope.hideMap = function() {
-            $("#listBusStop").show();
-            $("#mapBusStop").hide();
-            $("#busStopMap").hide();
+            $scope.showMapBusStop = false;            
+        }      
+    
+        $scope.search = {
+          name: true,
+          value: true,
+          category: true
+        };
+
+        $scope.customFilter = function (item) {
+          if (!$scope.search.$) {// your input field is empty
+              return true;
+          }
+
+          var searchVal = $scope.search.$;
+          searchVal = searchVal.replace(/([()[{*+.$^\\|?])/g, '\\$1'); //special char
+          var regex = new RegExp('' + searchVal, 'i');        
+
+          console.log(item);
+          if (regex.test(item["ADDRESS"]) ) {
+              return true; 
+          }            
+          
+          return false;
         }
   }
 ])
@@ -544,8 +571,7 @@ angular.module('starter', ['ionic',"firebase"])
 .controller('LinesController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
   function($scope, $ionicLoading, $http, BusStopJson) {    
 
-        $("#mapLines").hide();
-        $("#linesMap").hide();
+        $scope.showMapLines = false;
 
         $scope.BusStopList = BusStopJson.busStopList;    
         $scope.Linhas = [];
@@ -561,9 +587,7 @@ angular.module('starter', ['ionic',"firebase"])
         $scope.Linhas.sort();
 
         $scope.showMap = function(line) {
-            $("#listLines").hide();
-            $("#mapLines").show();
-            $("#linesMap").show();
+            $scope.showMapLines = true;
 
             $scope.PinnedLinhas = [];
             var markersArray = [];
@@ -655,9 +679,30 @@ angular.module('starter', ['ionic',"firebase"])
         }                  
 
         $scope.hideMap = function() {
-            $("#listLines").show();
-            $("#mapLines").hide();
-            $("#linesMap").hide();
+            $scope.showMapLines = false;
+        }
+
+        $scope.search = {
+          name: true,
+          value: true,
+          category: true
+        };
+
+        $scope.customFilter = function (item) {
+          if (!$scope.search.$) {// your input field is empty
+              return true;
+          }
+
+          var searchVal = $scope.search.$;
+          searchVal = searchVal.replace(/([()[{*+.$^\\|?])/g, '\\$1'); //special char
+          var regex = new RegExp('' + searchVal, 'i');        
+
+          console.log("LINHA " + item);
+          if (regex.test("LINHA " + item) ) {
+              return true; 
+          }            
+          
+          return false;
         }
   }
 ])
@@ -667,7 +712,7 @@ angular.module('starter', ['ionic',"firebase"])
       
 
        $scope.reply_click = function() {
-          console.log('bla');
+          alert('bla');
        }
 
       var templateElemento = '<div class="item item-avatar item-button-right">'
@@ -765,4 +810,11 @@ angular.module('starter', ['ionic',"firebase"])
         ElementoListaHistorico.append(elemento);
       }
   }
-]);
+])
+
+.filter('customSearch',function($scope) {
+  return function(item, type) {
+    console.log('bla-bla-bla');
+    return true;
+  }
+});

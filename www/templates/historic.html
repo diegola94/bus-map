@@ -1,17 +1,13 @@
 <ion-view view-title="Histórico">
+	<ion-nav-buttons side="right">              
+    	<button class="button button-icon icon ion-log-out" ng-click="signout()"></button>
+    </ion-nav-buttons>
     <ion-content class="has-bottom"> 
 		<ion-list>
-				<label class="item item-input">
-				    <i class="icon ion-search placeholder-icon"></i>
-				    <input type="text" placeholder="Busca">
-				</label>
 				<div class="list" id="listaHistorico">
 
 		       	</div>
 		</ion-list>		
-	</ion-content>
-	<div class="fixed-footer">
-		<button class="button icon-left ion-log-out button-assertive button-logout" ng-click="signout()"> Sair </button>		
-	</div>
+	</ion-content>	
 </ion-view>
     

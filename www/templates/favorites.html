@@ -1,19 +1,16 @@
 <ion-view view-title="Favoritos">
+	<ion-nav-buttons side="right">              
+    	<button class="button button-icon icon ion-log-out" ng-click="signout()"></button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="left">              
+    	<button class="button button-icon icon ion-ios-plus-outline" ng-click="showPopup()"></button>
+    </ion-nav-buttons>
     <ion-content class="has-bottom">
-		<ion-list>		
-				<label class="item item-input">
-				    <i class="icon ion-search placeholder-icon"></i>
-				    <input type="text" placeholder="Busca">
-				</label>
-
+		<ion-list>						
 				<div class="list" id="listaFavoritos">
 
 		       	</div>
 		</ion-list>						
-	</ion-content>
-	<div class="fixed-footer">
-		<button class="button icon-left ion-log-out button-assertive button-logout" ng-click="signout()"> Sair </button>		
-		<button class="button button-positive button-add-fav" ng-click="showPopup()"> <i class="icon ion-ios-plus-outline"></i> Novo favorito</button>
-	</div>
+	</ion-content>	
 </ion-view>
     

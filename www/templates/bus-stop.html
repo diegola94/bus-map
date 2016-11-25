@@ -1,12 +1,19 @@
 <ion-view view-title="Pontos">
+	<ion-nav-buttons side="right">              
+    	<button class="button button-icon icon ion-log-out" ng-click="signout()"></button>    	
+    </ion-nav-buttons>
+	
+	<ion-nav-buttons side="left">
+    	<button class="button button-icon icon ion-ios-arrow-back" ng-click="hideMap()" ng-show="showMapBusStop"></button>
+    </ion-nav-buttons>
     <ion-content>
-		<ion-list id="listBusStop">
+		<ion-list id="listBusStop" ng-hide="showMapBusStop">
 				<label class="item item-input">
 				    <i class="icon ion-search placeholder-icon"></i>
-				    <input type="text" placeholder="Busca">
+				    <input type="text" placeholder="Busca" ng-model="search.$">
 				</label>
 		        <div class="list">
-				   <a class="item item-avatar item-button-right"  ng-repeat="BusStop in BusStopList">
+				   <a class="item item-avatar item-button-right"  ng-repeat="BusStop in BusStopList|filter:customFilter">
 				      <img src="../img/bus-map-icon.jpg">
 				      <div style="display: block; float: left; ">
 					      <h2> {{ BusStop.ADDRESS }} </h2>
@@ -18,13 +25,7 @@
 				   </a>
 		        </div>
 		</ion-list>
-		<div id="busStopMap" class="map" data-tap-disabled="true"></div>
-		<div id="mapBusStop">            
-            <button class="button icon-left ion-ios-arrow-back button-positive button-back" ng-click="hideMap()"> Voltar </button>
-        </div>
+		<div id="busStopMap" class="map" data-tap-disabled="true" ng-show="showMapBusStop"></div>
         
-	</ion-content>
-	<div class="fixed-footer">
-		<button class="button icon-left ion-log-out button-assertive button-logout" ng-click="signout()"> Sair </button>		
-	</div>
+	</ion-content>	
 </ion-view>
