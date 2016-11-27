@@ -37,6 +37,7 @@ angular.module('starter', ['ionic',"firebase"])
 
      confirmPopup.then(function(res) {
        if(res) {
+          localStorage.removeItem('user');
           $state.go('login');
           firebase.auth().signOut();          
        } else {
@@ -158,6 +159,7 @@ angular.module('starter', ['ionic',"firebase"])
     })
 
     .state('tabs.historic', {
+      cache: false,
       url: "/historic",
       views: {
         'historic-tab': {
@@ -250,7 +252,10 @@ angular.module('starter', ['ionic',"firebase"])
                   .then(function(firebaseUser) {
                       //$scope.message = "User created with uid: " + firebaseUser.uid;            
           		        alert(firebaseUser.email + " logged in successfully!");
+                    
+                        localStorage['user'] = firebaseUser.email;
                       $state.go('tabs.home');
+                      location.reload();
                   }).catch(function(error) {		    
           			      alert(error.message);
                       //$scope.error = error;
@@ -313,7 +318,10 @@ angular.module('starter', ['ionic',"firebase"])
 ])
 
 .controller('MapController',  ["$scope", '$ionicLoading', '$http', "BusStopJson", 
-  function($scope, $ionicLoading, $http, BusStopJson) {                  
+  function($scope, $ionicLoading, $http, BusStopJson) {                              
+            
+
+            $scope.buscaOnibus = false;
             var markersArray = [];
             var myLatlng = new google.maps.LatLng(-23.9804479, -46.3109819);                 
 
@@ -333,6 +341,8 @@ angular.module('starter', ['ionic',"firebase"])
             var directionsService = new google.maps.DirectionsService;
             var directionsDisplay = new google.maps.DirectionsRenderer;                 
             var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+            google.maps.event.addListener(map, 'click', find_closest_marker);
      
             directionsDisplay.setMap(map);
 
@@ -343,9 +353,7 @@ angular.module('starter', ['ionic',"firebase"])
                     icon: 'img/icon-you-here.png'
             });
 
-            $scope.map = map;
-
-
+            $scope.map = map;            
 
             // navigator.geolocation.getCurrentPosition(function(pos) {
             //     map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
@@ -356,9 +364,6 @@ angular.module('starter', ['ionic',"firebase"])
             //         icon: 'img/icon-you-here.png'
             //     });
             // });
-
-            
-
 
             var allInfoWindows = [];                          
      
@@ -387,12 +392,13 @@ angular.module('starter', ['ionic',"firebase"])
                                 content: contentString
                           });
 
-                          allInfoWindows.push(infowindow);
+                          allInfoWindows.push(infowindow);                          
 
                           var marker = new google.maps.Marker({
                                 position: myLatlng,
                                 map: map,
-                                icon: 'img/icon-bus-stop.png'
+                                icon: 'img/icon-bus-stop.png',
+                                title: JSON.stringify(this)
                           });                              
                           
                           markersArray.push(marker);
@@ -403,46 +409,122 @@ angular.module('starter', ['ionic',"firebase"])
                               
                               infowindow.open(map, marker);
                           });              
+
+                          map.markersArray = markersArray;
                     });                                           
                 } else {
                       for (var i = 0; i < markersArray.length; i++ ) 
-                        markersArray[i].setMap(null);
+                        map.markersArray[i].setMap(null);
                       
-                      markersArray.length = 0;
+                      map.markersArray.length = 0;
                 }
             });                        
            
-            var originAddress = (document.getElementById('txtOrigin'));            ;
+            var originAddress = (document.getElementById('txtOrigin'));
             var destinationAddress = (document.getElementById('txtDestination'));
+            var originLatLong = [];
+            var destLatLong = [];
+            
 
             var originAutocomplete = new google.maps.places.Autocomplete(originAddress);
             originAutocomplete.bindTo('bounds', map);
 
+            originAutocomplete.addListener('place_changed', function() {              
+              originLatLong[0] = originAutocomplete.getPlace().geometry.location.lat();
+              originLatLong[1] = originAutocomplete.getPlace().geometry.location.lng();              
+            })
+
             var destinationAutocomplete = new google.maps.places.Autocomplete(destinationAddress);
             destinationAutocomplete.bindTo('bounds', map);
 
-            $( "#calcRouteForm" ).submit(function( event ) {                  
-                  directionsService.route({
-                        origin: document.getElementById('txtOrigin').value,
-                        destination: document.getElementById('txtDestination').value,
-                        travelMode: google.maps.TravelMode.DRIVING,
-                        transitOptions: {
-                          departureTime: new Date(1337675679473),
-                          modes: [google.maps.TransitMode.BUS],
-                          routingPreference: google.maps.TransitRoutePreference.FEWER_TRANSFERS
-                        }
-                      }, 
-                      function(response, status) {
-                            if (status === google.maps.DirectionsStatus.OK) {
-                                directionsDisplay.setDirections(response);
-                            } else {
-                                window.alert('Directions request failed due to ' + status);
-                            }
-                  });            
+            destinationAutocomplete.addListener('place_changed', function() {              
+              destLatLong[0] = destinationAutocomplete.getPlace().geometry.location.lat();
+              destLatLong[1] = destinationAutocomplete.getPlace().geometry.location.lng();              
+            })
 
+            $scope.PinnedLinhas = [];
+            $( "#calcRouteForm" ).submit(function( event ) {                  
+                  $scope.buscaOnibus = true;
+                  var nearestBusStopOrigin = JSON.parse(find_closest_marker(originLatLong[0], originLatLong[1], map));
+                  
+                  for (var i = 0; i < map.markersArray.length; i++ ) 
+                        map.markersArray[i].setMap(null);
+
+                  map.markersArray.length = 0;
+
+                  $.each(BusStopJson.busStopList, function() {
+                      var busStops = this;
+                      $.each(this.LINHAS, function() {
+                          var linhaMapa = this.LINHA;
+                          $.each(nearestBusStopOrigin.LINHAS, function() {                             
+                            if(this.LINHA == linhaMapa){
+                                $scope.PinnedLinhas.push(busStops);
+                            }
+                          })
+                      })
+                  })                                                    
+
+                  $.each( $scope.PinnedLinhas, function() {                
+                          var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);                                                  
+                          var marker = new google.maps.Marker({
+                                position: myLatlng,
+                                map: map,
+                                title: JSON.stringify(this)
+                          });                                                                                  
+
+                          map.markersArray.push(marker);
+                  })
+
+                  var nearestBusStopDest = JSON.parse(find_closest_marker(destLatLong[0], destLatLong[1], map));
+                  $scope.linhaEscolhida = "";
+
+                  $.each(nearestBusStopOrigin.LINHAS, function() {                             
+                      var nearestLinhaOrigin = this.LINHA;
+                      $.each(nearestBusStopDest.LINHAS, function() {
+                          if(nearestLinhaOrigin == this.LINHA){
+                            $scope.linhaEscolhida = this.LINHA;
+                            return false;
+                          }
+                      })
+                  })
+                  
+                  for (var i = 0; i < map.markersArray.length; i++ ) 
+                        map.markersArray[i].setMap(null);
+
+                  map.markersArray.length = 0;
+
+                  $scope.PinnedLinhas = [];
+                  $.each(BusStopJson.busStopList, function() {
+                      var busStops = this;
+
+                      $.each(this.LINHAS, function() {                
+                          if(this.LINHA == $scope.linhaEscolhida){
+                              $scope.PinnedLinhas.push(busStops);
+                          }
+                      })
+                  })
+
+                  $.each( $scope.PinnedLinhas, function() {                
+                          var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);                                                  
+                          var marker = new google.maps.Marker({
+                                position: myLatlng,
+                                map: map,
+                                title: JSON.stringify(this)
+                          });                                                                                  
+
+                          map.markersArray.push(marker);
+                  })                  
+
+
+                  var email = localStorage.getItem("user");                    
                   if( (document.getElementById('txtOrigin').value != null || document.getElementById('txtOrigin').value != undefined )  && (document.getElementById('txtDestination').value != null || document.getElementById('txtDestination').value != undefined )){
                      var StorageHistorico = [];
-                     StorageHistorico = JSON.parse(localStorage.getItem("historico"));
+                      
+                     if(email != null || email != undefined || email != '' ){
+                          StorageHistorico = JSON.parse(localStorage.getItem(email + "_historico"));      
+                     }          
+
+                     
                       if(StorageHistorico == null || StorageHistorico == undefined){
                         StorageHistorico = [];
                       }
@@ -452,11 +534,34 @@ angular.module('starter', ['ionic',"firebase"])
                   };
                 
                   StorageHistorico.push(historico);
-                  localStorage.setItem("historico", JSON.stringify(StorageHistorico));
+                  localStorage.setItem(email + "_historico", JSON.stringify(StorageHistorico));
 
                   }
                   event.preventDefault();
             });          
+
+            function rad(x) {return x*Math.PI/180;}
+            function find_closest_marker( lat, lng, map ) {                
+                var R = 6371; // radius of earth in km
+                var distances = [];
+                var closest = -1;
+                for( i=0;i<map.markersArray.length; i++ ) {
+                    var mlat = map.markersArray[i].position.lat();
+                    var mlng = map.markersArray[i].position.lng();
+                    var dLat  = rad(mlat - lat);
+                    var dLong = rad(mlng - lng);
+                    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                        Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
+                    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                    var d = R * c;
+                    distances[i] = d;
+                    if ( closest == -1 || d < distances[closest] ) {
+                        closest = i;
+                    }
+                }
+
+                return map.markersArray[closest].title;
+            }
   }
 ])
 
@@ -500,9 +605,7 @@ angular.module('starter', ['ionic',"firebase"])
                     icon: 'img/icon-you-here.png'
             });
 
-            $scope.map = map;  
-            
-            console.log($scope.PinnedLinhas);
+            $scope.map = map;                          
 
             var myLatlng = new google.maps.LatLng(busStop.BusStop.COORDINATEY, busStop.BusStop.COORDINATEX);
 
@@ -708,29 +811,57 @@ angular.module('starter', ['ionic',"firebase"])
 ])
 
 .controller('FavoritesController', ["$scope", '$ionicLoading', '$ionicPopup', '$http', "BusStopJson", 
-  function($scope, $ionicLoading, $ionicPopup, $http, BusStopJson) {    
-      
-
-       $scope.reply_click = function() {
-          alert('bla');
-       }
-
+  function($scope, $ionicLoading, $ionicPopup, $http, BusStopJson) {          
+ 
       var templateElemento = '<div class="item item-avatar item-button-right">'
                            + '<img src="../img/bus-map-icon-star.jpg">'
                            + '<p>#apelido#</p>'
                            + '<span>#rota#</span>'
                            + '<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button>-->'
-                           + '<button data-index="#index#" ng-click="reply_click()" class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear"></button>'
-                           + '</div>'
+                           + '<button data-index="#index#" class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear click-excluir-fav"></button>'
+                           + '</div>';      
+            
       var ElementoListaFavoritos = angular.element( document.querySelector( '#listaFavoritos' ) );
-      var Storagefavoritos = JSON.parse(localStorage.getItem("favoritos"));
+
+      var email = localStorage.getItem("user");
+      if(email != null || email != undefined || email != '' ){
+          var Storagefavoritos = JSON.parse(localStorage.getItem(email + "_favoritos"));      
+      }
+      
 
       for (i in Storagefavoritos)
       {
         var elemento = templateElemento.replace("#index#",i).replace("#apelido#",Storagefavoritos[i].apelido).replace("#rota#",Storagefavoritos[i].rota);
         ElementoListaFavoritos.append(elemento);
       }
+      
+      $('.click-excluir-fav').click(function () {             
+          var confirmPopup = $ionicPopup.confirm({
+             title: 'Excluir',
+             template: 'Você tem certeza que deseja excluir o endereço?'
+           });
 
+           confirmPopup.then(function(res) {
+             if(res) {
+                $this = $(this);        
+                var index = $this.attr('data-index');
+                var ElementoListaFavoritos = angular.element( document.querySelector( '#listaFavoritos' ) );
+
+                var email = localStorage.getItem("user");
+                if(email != null || email != undefined || email != '' ){
+                  var Storagefavoritos = JSON.parse(localStorage.getItem(email + "_favoritos"));      
+                }
+                
+                Storagefavoritos.splice(index,1);
+                if(email != null || email != undefined || email != '' ){
+                   localStorage.setItem(email + "_favoritos", JSON.stringify(Storagefavoritos));
+                }
+                location.reload();
+             } else {
+               //console.log('You are not sure');
+             }
+           });      
+       })
 
 
       $scope.showPopup = function() {
@@ -773,7 +904,10 @@ angular.module('starter', ['ionic',"firebase"])
           myPopup.then(function(res) {
               if (res) {
                 var Storagefavoritos = [];
-                Storagefavoritos = JSON.parse(localStorage.getItem("favoritos"));
+                var email = localStorage.getItem("user");
+                if(email != null || email != undefined || email != '' ){
+                  Storagefavoritos = JSON.parse(localStorage.getItem(email + "_favoritos"));      
+                }
                 if(Storagefavoritos == null || Storagefavoritos == undefined){
                   Storagefavoritos = [];
                 }
@@ -783,7 +917,11 @@ angular.module('starter', ['ionic',"firebase"])
                   };
                 
                 Storagefavoritos.push(favorito);
-                localStorage.setItem("favoritos", JSON.stringify(Storagefavoritos));
+
+                if(email != null || email != undefined || email != '' ){
+                  localStorage.setItem(email + "_favoritos", JSON.stringify(Storagefavoritos));
+                }
+                
                 location.reload();
               }
           });
@@ -802,7 +940,12 @@ angular.module('starter', ['ionic',"firebase"])
                            + '<button class="button button-positive button-list"> <i class="icon ion-android-refresh"></i></button>'
                            + '</div>'
       var ElementoListaHistorico = angular.element( document.querySelector( '#listaHistorico' ) );
-      var StorageHistorico = JSON.parse(localStorage.getItem("historico"));
+
+      var email = localStorage.getItem("user");
+      var StorageHistorico = "";      
+      if(email != null || email != undefined || email != '' ){
+          StorageHistorico = JSON.parse(localStorage.getItem(email + "_historico"));      
+      }          
 
       for (i in StorageHistorico)
       {

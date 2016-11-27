@@ -17,10 +17,17 @@
                     <label for="show-pin">Mostrar todos os pontos</label>
                 </p>         
                 
-                <!-- <input type="submit" value="Busca"> -->
+                <input type="submit" value="Busca">
                 
             </form>
             
-            <div id="map" class="map" data-tap-disabled="true"></div>                        
+            <div class="card" ng-show="buscaOnibus">
+              <div class="item item-text-wrap">
+                Melhor ônibus: {{linhaEscolhida}}
+              </div>
+            </div>
+                        
+            <div id="map" class="map" data-tap-disabled="true"></div>
+            
         </ion-content>        
 </ion-view>
