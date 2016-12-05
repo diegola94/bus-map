@@ -39,7 +39,7 @@ angular.module('starter', ['ionic',"firebase"])
        if(res) {
           localStorage.removeItem('user');
           $state.go('login');
-          firebase.auth().signOut();          
+          firebase.auth().signOut();
        } else {
          //console.log('You are not sure');
        }
@@ -90,6 +90,7 @@ angular.module('starter', ['ionic',"firebase"])
 
     // State to represent Login View
     .state('login', {
+        cache: false,
         url: "/login",
         templateUrl: "templates/login.html",
         controller: "Login"       
@@ -98,27 +99,21 @@ angular.module('starter', ['ionic',"firebase"])
 
     // setup an abstract state for the tabs directive
     .state('signup', {
+        cache: false,
         url: "/signup",
         templateUrl: "templates/signup.html",
         controller: "Signup"
        
     })
 
-    // Each tab has its own nav history stack:
-
-    .state('db_connect', {
-        url: '/db_connect',
-        templateUrl: "templates/db_connect.html",
-        controller: "DB_connect"
-    })
-
-    .state('tabs', {
+    // Each tab has its own nav history stack:    
+    .state('tabs', {      
       url: "/tab",
       abstract: true,
       templateUrl: "templates/tabs.html"
     })
 
-    .state('tabs.home', {
+    .state('tabs.home', {      
       url: "/home",
       views: {
         'home-tab': {
@@ -129,6 +124,7 @@ angular.module('starter', ['ionic',"firebase"])
     })
 
     .state('tabs.bus-stop', {
+      cache: false,
       url: "/bus-stop",
       views: {
         'bus-stop-tab': {
@@ -139,6 +135,7 @@ angular.module('starter', ['ionic',"firebase"])
     })
 
     .state('tabs.lines', {
+      cache: false,
       url: "/lines",
       views: {
         'lines-tab': {
@@ -149,6 +146,7 @@ angular.module('starter', ['ionic',"firebase"])
     })
 
     .state('tabs.favorites', {
+      cache: false,
       url: "/favorites",
       views: {
         'favorites-tab': {
@@ -174,41 +172,6 @@ angular.module('starter', ['ionic',"firebase"])
 
 })
 
-.controller("DB_connect",  ["$scope", "Auth",'$state',
-  function($scope, Auth,$state) {
-
-    	$scope.submit_db = function() {
-    			$refpath = $scope.dbForm.ref.$modelValue;
-    			$data1 = $scope.dbForm.data1.$modelValue;
-    			$data2 = $scope.dbForm.data2.$modelValue;
-    			$data3 = $scope.dbForm.data3.$modelValue;
-    			
-    		//write data to db with current user
-    		firebase.database().ref($refpath).set({
-    			data1: $data1,
-    			data2: $data2,
-    			data3: $data3
-    		}).then(function() {
-             alert("Data submitted");
-            })
-    		.catch(function(error) {
-    		    
-    			alert(error.message);
-            });
-    	}	
-  		
-      //go to first tab
-  		$scope.signup = function() {
-  		   $state.go('signup');
-  		}
-  		
-      //go to db tab
-  		$scope.login = function() {
-  		   $state.go('login');
-  		}		
-}])
-	
-	
 .controller("Login",  ["$scope", "Auth",'$state',
   function($scope, Auth,$state) {
 
@@ -242,34 +205,42 @@ angular.module('starter', ['ionic',"firebase"])
         		
           
           if ($signin_email === undefined || $signin_email === "" || $signin_email === null) {
-            alert("Email inválido.");
+            var alertPopup = $ionicPopup.alert({
+               title: 'Alerta',
+               template: 'Email Inválido'
+            });                                  
           } 
           else if ($signin_password === undefined || $signin_password === "" || $signin_password === null) {
-            alert("Preecha o campo senha.");
+            var alertPopup = $ionicPopup.alert({
+               title: 'Alerta',
+               template: 'Preecha o campo senha.'
+            });                                              
           } else {
             	// sign in
               Auth.$signInWithEmailAndPassword($signin_email, $signin_password)
                   .then(function(firebaseUser) {
-                      //$scope.message = "User created with uid: " + firebaseUser.uid;            
-          		        alert(firebaseUser.email + " logged in successfully!");
-                    
-                        localStorage['user'] = firebaseUser.email;
+                      //$scope.message = "User created with uid: " + firebaseUser.uid;                    		                            
+                      localStorage['user'] = firebaseUser.email;
                       $state.go('tabs.home');
                       location.reload();
                   }).catch(function(error) {		    
-          			      alert(error.message);
-                      //$scope.error = error;
+                      var alertPopup = $ionicPopup.alert({
+                         title: 'Alerta',
+                         template: error.message
+                      });                                			                            
               });
           }      
       }
 
       $scope.semLogin = function() {             
+          localStorage.removeItem('user');          
+          firebase.auth().signOut();
           $state.go('tabs.home');
       }      
 }])
   
-.controller("Signup",  ["$scope", "Auth",'$state',
-  function($scope, Auth,$state) {	
+.controller("Signup",  ["$scope", "Auth",'$state','$ionicPopup',
+  function($scope, Auth,$state , $ionicPopup) {	
     	$scope.login = function(){
     	     $state.go('login');
     	}
@@ -285,19 +256,40 @@ angular.module('starter', ['ionic',"firebase"])
     	  //get users email and password from ui
     		$email_str = $scope.userForm.email.$modelValue;
     		$password_str = $scope.userForm.password.$modelValue;
+        $confirmpassword_str = $scope.userForm.confirmpassword.$modelValue;
      
         if ($email_str === undefined || $email_str === "" || $email_str === null) {
-            alert("Email inválido.");
+            var alertPopup = $ionicPopup.alert({
+               title: 'Alerta',
+               template: 'Email Inválido'
+            });                      
         } 
         else if ($password_str === undefined || $password_str === "" || $password_str === null) {
-            alert("Preecha o campo senha.");
+            var alertPopup = $ionicPopup.alert({
+               title: 'Alerta',
+               template: 'Preecha o campo senha.'
+            });                      
+        }
+        else if ($confirmpassword_str != $password_str) {
+            var alertPopup = $ionicPopup.alert({
+               title: 'Alerta',
+               template: 'O campos senha e confirmar senha devem ser iguais.'
+            });                      
         } else {
             // Create a new user
             Auth.$createUserWithEmailAndPassword($email_str, $password_str)
               .then(function(firebaseUser) {
+                var alertPopup = $ionicPopup.alert({
+                  title: 'Alerta',
+                  template: 'Usuário criado com sucesso!'
+                });          
+                $state.go('login');
                 $scope.message = "User created with uid: " + firebaseUser.uid;
               }).catch(function(error) {
-                alert(error.message);
+                var alertPopup = $ionicPopup.alert({
+                   title: 'Alerta',
+                   template: error.message
+                });                 
                 $scope.error = error;
             });
         }
@@ -317,11 +309,8 @@ angular.module('starter', ['ionic',"firebase"])
     }
 ])
 
-.controller('MapController',  ["$scope", '$ionicLoading', '$http', "BusStopJson", 
-  function($scope, $ionicLoading, $http, BusStopJson) {                              
-            
-
-            $scope.buscaOnibus = false;            
+.controller('MapController',  ["$scope", '$ionicLoading', '$http', "BusStopJson", "$ionicPopup", 
+  function($scope, $ionicLoading, $http, BusStopJson, $ionicPopup) {                                          
             var AllMarkersArray = [];
             var myLatlng = new google.maps.LatLng(-23.9804479, -46.3109819);                 
 
@@ -377,7 +366,8 @@ angular.module('starter', ['ionic',"firebase"])
                 AllMarkersArray.push(marker);              
             });                                        
   
-            $("#show-pin").change(function() {  
+            $("#show-pin").change(function() {
+            //map.AllMarkersArray = [];  
                 if(this.checked) {                    
                     $.each( BusStopJson.busStopList, function() {                
                           var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);
@@ -424,7 +414,7 @@ angular.module('starter', ['ionic',"firebase"])
                       for (var i = 0; i < map.AllMarkersArray.length; i++ ) 
                         map.AllMarkersArray[i].setMap(null);
                       
-                        map.AllMarkersArray.length = 0;
+                       // map.AllMarkersArray.length = 0;
                 }
             });                        
            
@@ -451,105 +441,144 @@ angular.module('starter', ['ionic',"firebase"])
             })
 
             $scope.PinnedLinhas = [];
-            $( "#calcRouteForm" ).submit(function( event ) {                  
-                  $scope.buscaOnibus = true;
-                  map.AllMarkersArray = AllMarkersArray;
 
-                  //pega o ponto mais próximo da origem
-                  var nearestBusStopOrigin = JSON.parse(find_closest_marker(originLatLong[0], originLatLong[1], AllMarkersArray));
-                  
-                  for (var i = 0; i < map.AllMarkersArray.length; i++ ) 
-                        map.AllMarkersArray[i].setMap(null);
+            $('#txtOrigin').keypress(function (e) {              
+              if (e.which == 13) {
+                $("#txtOrigin").blur();
+                $('form#calcRouteForm').submit();                
+              }
+            });
 
-                  map.AllMarkersArray.length = 0;
+            $('#txtDestination').keypress(function (e) {              
+              if (e.which == 13) {
+                $("#txtDestination").blur();
+                $('form#calcRouteForm').submit();                
+              }
+            });
+            $( "#calcRouteForm" ).submit(function( event ) {  
+                  map.AllMarkersArray = [];                
+                  if (($('#txtOrigin').val() === undefined || $('#txtOrigin').val() === "" || $('#txtOrigin').val() === null) || ($('#txtDestination').val() === undefined || $('#txtDestination').val() === "" || $('#txtDestination').val() === null)) {
+                      var alertPopup = $ionicPopup.alert({
+                         title: 'Alerta',
+                         template: 'Os campos de origem e destino devem estar preenchidos'
+                      });  
+                  } 
+                  else if ((originLatLong === undefined || originLatLong.length <= 0 || originLatLong === null) || (destLatLong === undefined || destLatLong.length <= 0 || destLatLong === null)) {
+                      var alertPopup = $ionicPopup.alert({
+                         title: 'Alerta',
+                         template: 'Selecione um endereço válido'
+                      });  
+                  } else {
+                      $("#show-pin").attr('checked', false);
+                      map.AllMarkersArray = AllMarkersArray;
 
-                  // Pega todos os pontos de onibus, que tem as linhas que o ponto de origem possui.
-                  $.each(BusStopJson.busStopList, function() {
-                      var busStops = this;
-                      $.each(this.LINHAS, function() {
-                          var linhaMapa = this.LINHA;
-                          $.each(nearestBusStopOrigin.LINHAS, function() {                             
-                            if(this.LINHA == linhaMapa){
-                                $scope.PinnedLinhas.push(busStops);
-                            }
+                      //pega o ponto mais próximo da origem
+                      var nearestBusStopOrigin = JSON.parse(find_closest_marker(originLatLong[0], originLatLong[1], AllMarkersArray));
+                      
+                      for (var i = 0; i < map.AllMarkersArray.length; i++ ) 
+                            map.AllMarkersArray[i].setMap(null);
+
+                      map.AllMarkersArray.length = 0;
+
+                      // Pega todos os pontos de onibus, que tem as linhas que o ponto de origem possui.
+                      $.each(BusStopJson.busStopList, function() {
+                          var busStops = this;
+                          $.each(this.LINHAS, function() {
+                              var linhaMapa = this.LINHA;
+                              $.each(nearestBusStopOrigin.LINHAS, function() {                             
+                                if(this.LINHA == linhaMapa){
+                                    $scope.PinnedLinhas.push(busStops);
+                                }
+                              })
+                          })
+                      })                                                    
+                      // Pina no mapa todos os pontos de onibus, que tem as linhas que o ponto de origem possui.
+                      $.each( $scope.PinnedLinhas, function() {                
+                              var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);                                                  
+                              var marker = new google.maps.Marker({
+                                    position: myLatlng,
+                                    map: map,
+                                    title: JSON.stringify(this)
+                              });                                                                                  
+
+                              map.AllMarkersArray.push(marker);
+                      })
+                      // pega o ponto mais próximo do destino.
+                      var nearestBusStopDest = JSON.parse(find_closest_marker(destLatLong[0], destLatLong[1], map.AllMarkersArray));
+                      $scope.linhaEscolhida = "";
+                      // compara o ponto mais próximo da origem e destino, para definir qual a linha ideal.
+                      $.each(nearestBusStopOrigin.LINHAS, function() {                             
+                          var nearestLinhaOrigin = this.LINHA;
+                          $.each(nearestBusStopDest.LINHAS, function() {
+                              if(nearestLinhaOrigin == this.LINHA){
+                                $scope.linhaEscolhida = this.LINHA;
+                                $("#buscaOnibus").show();
+                                $("#buscaOnibus").children('h1').html('Melhor Linha: ' + this.LINHA);
+                                return false;
+                              }
                           })
                       })
-                  })                                                    
-                  // Pina no mapa todos os pontos de onibus, que tem as linhas que o ponto de origem possui.
-                  $.each( $scope.PinnedLinhas, function() {                
-                          var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);                                                  
-                          var marker = new google.maps.Marker({
-                                position: myLatlng,
-                                map: map,
-                                title: JSON.stringify(this)
-                          });                                                                                  
+                      // limpa os pontos
+                      for (var i = 0; i < map.AllMarkersArray.length; i++ ) 
+                            map.AllMarkersArray[i].setMap(null);
 
-                          map.AllMarkersArray.push(marker);
-                  })
-                  // pega o ponto mais próximo do destino.
-                  var nearestBusStopDest = JSON.parse(find_closest_marker(destLatLong[0], destLatLong[1], map.AllMarkersArray));
-                  $scope.linhaEscolhida = "";
-                  // compara o ponto mais próximo da origem e destino, para definir qual a linha ideal.
-                  $.each(nearestBusStopOrigin.LINHAS, function() {                             
-                      var nearestLinhaOrigin = this.LINHA;
-                      $.each(nearestBusStopDest.LINHAS, function() {
-                          if(nearestLinhaOrigin == this.LINHA){
-                            $scope.linhaEscolhida = this.LINHA;
-                            return false;
-                          }
+                      map.AllMarkersArray.length = 0;
+                      // monta o caminho da linha ideal
+                      $scope.PinnedLinhas = [];
+                      $.each(BusStopJson.busStopList, function() {
+                          var busStops = this;
+
+                          $.each(this.LINHAS, function() {                
+                              if(this.LINHA == $scope.linhaEscolhida){
+                                  $scope.PinnedLinhas.push(busStops);
+                              }
+                          })
                       })
-                  })
-                  // limpa os pontos
-                  for (var i = 0; i < map.AllMarkersArray.length; i++ ) 
-                        map.AllMarkersArray[i].setMap(null);
+                      // pina o caminho da linha ideal
+                      $.each( $scope.PinnedLinhas, function() {                
+                              var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);                                                  
+                              var marker = new google.maps.Marker({
+                                    position: myLatlng,
+                                    map: map,
+                                    title: JSON.stringify(this),                                  
+                                    icon: 'img/icon-route.png'
+                              });                                                                                  
 
-                  map.AllMarkersArray.length = 0;
-                  // monta o caminho da linha ideal
-                  $scope.PinnedLinhas = [];
-                  $.each(BusStopJson.busStopList, function() {
-                      var busStops = this;
+                              map.AllMarkersArray.push(marker);
+                      })                  
 
-                      $.each(this.LINHAS, function() {                
-                          if(this.LINHA == $scope.linhaEscolhida){
-                              $scope.PinnedLinhas.push(busStops);
+                      // salva a origem e destino no localStorage do histórico do usuário
+                      var email = localStorage.getItem("user");                    
+                      if( (document.getElementById('txtOrigin').value != null || document.getElementById('txtOrigin').value != undefined )  && (document.getElementById('txtDestination').value != null || document.getElementById('txtDestination').value != undefined )){
+                           var StorageHistorico = [];
+                            
+                           if(email != null || email != undefined || email != '' ){
+                                StorageHistorico = JSON.parse(localStorage.getItem(email + "_historico"));      
+                           }          
+
+                         
+                          if(StorageHistorico == null || StorageHistorico == undefined){
+                            StorageHistorico = [];
                           }
-                      })
-                  })
-                  // pina o caminho da linha ideal
-                  $.each( $scope.PinnedLinhas, function() {                
-                          var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);                                                  
-                          var marker = new google.maps.Marker({
-                                position: myLatlng,
-                                map: map,
-                                title: JSON.stringify(this)
-                          });                                                                                  
+                          var historico = {
+                              origem:document.getElementById('txtOrigin').value,
+                              destino:document.getElementById('txtDestination').value,
+                              coordOrigem: {
+                                x: originLatLong[0],
+                                y: originLatLong[1]
+                              },
+                              coordDestino: {
+                                x: destLatLong[0],
+                                y: destLatLong[1]
+                              }
+                          };
+                    
+                          StorageHistorico.push(historico);
+                          localStorage.setItem(email + "_historico", JSON.stringify(StorageHistorico));
 
-                          map.AllMarkersArray.push(marker);
-                  })                  
-
-                  // salva a origem e destino no localStorage do histórico do usuário
-                  var email = localStorage.getItem("user");                    
-                  if( (document.getElementById('txtOrigin').value != null || document.getElementById('txtOrigin').value != undefined )  && (document.getElementById('txtDestination').value != null || document.getElementById('txtDestination').value != undefined )){
-                     var StorageHistorico = [];
-                      
-                     if(email != null || email != undefined || email != '' ){
-                          StorageHistorico = JSON.parse(localStorage.getItem(email + "_historico"));      
-                     }          
-
-                     
-                      if(StorageHistorico == null || StorageHistorico == undefined){
-                        StorageHistorico = [];
                       }
-                    var historico = {
-                    origem:document.getElementById('txtOrigin').value,
-                    destino:document.getElementById('txtDestination').value
-                  };
-                
-                  StorageHistorico.push(historico);
-                  localStorage.setItem(email + "_historico", JSON.stringify(StorageHistorico));
-
+                      event.preventDefault();
                   }
-                  event.preventDefault();
             });          
             // definição da função que acha o marker mais próximo
             function rad(x) {return x*Math.PI/180;}
@@ -585,6 +614,7 @@ angular.module('starter', ['ionic',"firebase"])
         $scope.showMapBusStop = false;
 
         $scope.showMap = function(busStop) {            
+            $('#busStopMap').show();
             $scope.showMapBusStop = true;
 
             console.log(busStop.BusStop);
@@ -655,7 +685,8 @@ angular.module('starter', ['ionic',"firebase"])
 
 
         $scope.hideMap = function() {
-            $scope.showMapBusStop = false;            
+            $scope.showMapBusStop = false;
+            $('#busStopMap').hide();
         }      
     
         $scope.search = {
@@ -672,8 +703,7 @@ angular.module('starter', ['ionic',"firebase"])
           var searchVal = $scope.search.$;
           searchVal = searchVal.replace(/([()[{*+.$^\\|?])/g, '\\$1'); //special char
           var regex = new RegExp('' + searchVal, 'i');        
-
-          console.log(item);
+          
           if (regex.test(item["ADDRESS"]) ) {
               return true; 
           }            
@@ -702,6 +732,7 @@ angular.module('starter', ['ionic',"firebase"])
         $scope.Linhas.sort();
 
         $scope.showMap = function(line) {
+            $('#linesMap').show();
             $scope.showMapLines = true;
 
             $scope.PinnedLinhas = [];
@@ -795,6 +826,7 @@ angular.module('starter', ['ionic',"firebase"])
 
         $scope.hideMap = function() {
             $scope.showMapLines = false;
+            $('#linesMap').hide();
         }
 
         $scope.search = {
@@ -877,21 +909,8 @@ angular.module('starter', ['ionic',"firebase"])
 
 
       $scope.showPopup = function() {
-        $scope.data = {}
-
-        var favHtml = ' <div class="list">'
-                      + '  <label class="item item-input item-stacked-label">'
-                      + '    <span class="input-label">Apelido para rota</span>'
-                      + '    <input type="text" placeholder="Casa">'
-                      + '  </label>'
-                      + '  <label class="item item-input item-stacked-label">'
-                      + '    <span class="input-label">Rota</span>'
-                      + '    <input type="text" placeholder="Av. Ana Costa 209">'
-                      + '  </label>  '
-                      + '</div>'
-                      
-
-         // An elaborate, custom popup
+           $scope.data = {}
+           // An elaborate, custom popup
            var myPopup = $ionicPopup.show({
            template: '<input type="text" ng-model="data.apelido" placeholder="Apelido para Rota"><br /><input type="text" ng-model="data.rota" placeholder="Rota">',
            title: 'Adicionar nova rota favorito',
@@ -942,34 +961,201 @@ angular.module('starter', ['ionic',"firebase"])
 ])
 
 .controller('HistoricController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
-  function($scope, $ionicLoading, $http, BusStopJson) {    
+    function($scope, $ionicLoading, $http, BusStopJson) {    
+          $scope.PinnedLinhas = [];
+          var AllMarkersArray = [];
+        
+          $.each( BusStopJson.busStopList, function() {                
+                var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);
+                
+                var marker = new google.maps.Marker({
+                      position: myLatlng,                      
+                      icon: 'img/icon-bus-stop.png',
+                      title: JSON.stringify(this)
+                });                              
+                
+                AllMarkersArray.push(marker);              
+          });   
+          
+          var templateElemento = '<div class="item item-avatar item-button-right">'
+                               + '  <img src="../img/bus-map-icon-historic.jpg">'
+                               + '  <span>#origem#</span><br />'
+                               + '  <input type="hidden" value="#coordOrigem#">'
+                               + '  <span class="span-list">#destino#</span>'   
+                               + '  <input type="hidden" value="#coordDestino#">'
+                               + '  <button class="button button-positive button-list click-show-historic"> <i class="icon ion-android-refresh"></i></button>'
+                               + '</div>'
+          var ElementoListaHistorico = angular.element( document.querySelector( '#listaHistorico' ) );
 
-      var templateElemento = '<div class="item item-avatar item-button-right">'
-                           + '<img src="../img/bus-map-icon-historic.jpg">'
-                           + '<span>#origem#</span><br />'
-                           + '<span class="span-list">#destino#</span>'
-                           + '<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button> -->'
-                           + '<button class="button button-positive button-list"> <i class="icon ion-android-refresh"></i></button>'
-                           + '</div>'
-      var ElementoListaHistorico = angular.element( document.querySelector( '#listaHistorico' ) );
+          var email = localStorage.getItem("user");
+          var StorageHistorico = "";      
+          if(email != null || email != undefined || email != '' ){
+              StorageHistorico = JSON.parse(localStorage.getItem(email + "_historico"));      
+          }          
 
-      var email = localStorage.getItem("user");
-      var StorageHistorico = "";      
-      if(email != null || email != undefined || email != '' ){
-          StorageHistorico = JSON.parse(localStorage.getItem(email + "_historico"));      
-      }          
+          for (i in StorageHistorico)
+          {
+            var elemento = templateElemento
+            .replace("#origem#",StorageHistorico[i].origem)
+            .replace("#destino#",StorageHistorico[i].destino)
+            .replace("#coordOrigem#",StorageHistorico[i].coordOrigem.x + '#' + StorageHistorico[i].coordOrigem.y )
+            .replace("#coordDestino#",StorageHistorico[i].coordDestino.x + '#' + StorageHistorico[i].coordDestino.y);
+            ElementoListaHistorico.append(elemento);
+          }
 
-      for (i in StorageHistorico)
-      {
-        var elemento = templateElemento.replace("#origem#",StorageHistorico[i].origem).replace("#destino#",StorageHistorico[i].destino);
-        ElementoListaHistorico.append(elemento);
-      }
-  }
+          $('.click-show-historic').click(function () {
+                $('#historicMap').show();
+                $('#buttonBackHistoric').show();
+                $('#listHistoric').hide();
+                $this = $(this);      
+                            
+                var coordOrigem = ($this.parent().children('input')[0].value).split('#');
+                var coordDestino = ($this.parent().children('input')[1].value).split('#');
+                                                  
+                var markersArray = [];
+                var myLatlng = new google.maps.LatLng(-23.9804479, -46.3109819);                 
+
+                var mapOptions = {
+                    center: new google.maps.LatLng(coordDestino[0], coordDestino[1]),
+                    zoom: 16,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,         
+                    mapTypeControl: false,
+                    styles: [{
+                      featureType: "transit.station.bus",
+                      stylers: [
+                        { visibility: "off" }
+                      ]
+                    }]
+                };
+                
+                var directionsService = new google.maps.DirectionsService;
+                var directionsDisplay = new google.maps.DirectionsRenderer;                 
+                var map = new google.maps.Map(document.getElementById("historicMap"), mapOptions);
+         
+                directionsDisplay.setMap(map);
+
+                var myLocation = new google.maps.Marker({
+                        position: myLatlng,
+                        map: map,                
+                        title: "Você",
+                        icon: 'img/icon-you-here.png'
+                });
+
+                $scope.map = map;                            
+                
+                map.AllMarkersArray = AllMarkersArray;
+
+                //pega o ponto mais próximo da origem
+                var nearestBusStopOrigin = JSON.parse(find_closest_marker(coordOrigem[0], coordOrigem[1], AllMarkersArray));
+                
+                for (var i = 0; i < map.AllMarkersArray.length; i++ ) 
+                      map.AllMarkersArray[i].setMap(null);
+
+                map.AllMarkersArray.length = 0;
+
+                // Pega todos os pontos de onibus, que tem as linhas que o ponto de origem possui.
+                $.each(BusStopJson.busStopList, function() {
+                    var busStops = this;
+                    $.each(this.LINHAS, function() {
+                        var linhaMapa = this.LINHA;
+                        $.each(nearestBusStopOrigin.LINHAS, function() {                             
+                          if(this.LINHA == linhaMapa){
+                              $scope.PinnedLinhas.push(busStops);
+                          }
+                        })
+                    })
+                })                                                    
+                // Pina no mapa todos os pontos de onibus, que tem as linhas que o ponto de origem possui.
+                $.each( $scope.PinnedLinhas, function() {                
+                        var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);                                                  
+                        var marker = new google.maps.Marker({
+                              position: myLatlng,
+                              map: map,
+                              title: JSON.stringify(this)
+                        });                                                                                  
+
+                        map.AllMarkersArray.push(marker);
+                })
+                // pega o ponto mais próximo do destino.
+                var nearestBusStopDest = JSON.parse(find_closest_marker(coordDestino[0], coordDestino[1], map.AllMarkersArray));
+                $scope.linhaEscolhida = "";
+                // compara o ponto mais próximo da origem e destino, para definir qual a linha ideal.
+                $.each(nearestBusStopOrigin.LINHAS, function() {                             
+                    var nearestLinhaOrigin = this.LINHA;
+                    $.each(nearestBusStopDest.LINHAS, function() {
+                        if(nearestLinhaOrigin == this.LINHA){
+                          $scope.linhaEscolhida = this.LINHA;
+                          $("#buscaOnibusHistoric").show();
+                          $("#buscaOnibusHistoric").children('h1').html('Melhor Linha: ' + this.LINHA);
+                          return false;
+                        }
+                    })
+                })
+                // limpa os pontos
+                for (var i = 0; i < map.AllMarkersArray.length; i++ ) 
+                      map.AllMarkersArray[i].setMap(null);
+
+                map.AllMarkersArray.length = 0;
+                // monta o caminho da linha ideal
+                $scope.PinnedLinhas = [];
+                $.each(BusStopJson.busStopList, function() {
+                    var busStops = this;
+
+                    $.each(this.LINHAS, function() {                
+                        if(this.LINHA == $scope.linhaEscolhida){
+                            $scope.PinnedLinhas.push(busStops);
+                        }
+                    })
+                })
+                // pina o caminho da linha ideal
+                $.each( $scope.PinnedLinhas, function() {                
+                        var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);                                                  
+                        var marker = new google.maps.Marker({
+                              position: myLatlng,
+                              map: map,
+                              title: JSON.stringify(this),
+                              icon: 'img/icon-route.png'
+                        });                                                                                  
+
+                        map.AllMarkersArray.push(marker);
+                })                                                  
+          });
+
+          $scope.hideMap = function() {
+                $('#historicMap').hide();
+                $('#buttonBackHistoric').hide();
+                $('#listHistoric').show();
+                $("#buscaOnibusHistoric").hide();
+          }
+          
+          // definição da função que acha o marker mais próximo
+          function rad(x) {return x*Math.PI/180;}
+          function find_closest_marker( lat, lng, markerArray ) {                
+              var R = 6371; // radius of earth in km
+              var distances = [];
+              var closest = -1;
+              for( i=0;i<markerArray.length; i++ ) {
+                  var mlat = markerArray[i].position.lat();
+                  var mlng = markerArray[i].position.lng();
+                  var dLat  = rad(mlat - lat);
+                  var dLong = rad(mlng - lng);
+                  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
+                  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                  var d = R * c;
+                  distances[i] = d;
+                  if ( closest == -1 || d < distances[closest] ) {
+                      closest = i;
+                  }
+              }
+
+              return markerArray[closest].title;
+          }      
+    }
 ])
 
 .filter('customSearch',function($scope) {
-  return function(item, type) {
-    console.log('bla-bla-bla');
+  return function(item, type) {  
     return true;
   }
 });

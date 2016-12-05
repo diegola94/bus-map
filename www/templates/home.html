@@ -15,17 +15,12 @@
                 <p class="item item-input bm-search bm-checkbox">
                     <input type="checkbox" id="show-pin" />
                     <label for="show-pin">Mostrar todos os pontos</label>
-                </p>         
-                
-                <input type="submit" value="Busca">
-                
+                </p>                     
             </form>
             
-            <div class="card" ng-show="buscaOnibus">
-              <div class="item item-text-wrap">
-                Melhor ônibus: {{linhaEscolhida}}
-              </div>
-            </div>
+            <div class="bar bar-footer bar-balanced" style="display: none" id="buscaOnibus">
+               <h1 class="title"></h1>
+            </div>            
                         
             <div id="map" class="map" data-tap-disabled="true"></div>
             

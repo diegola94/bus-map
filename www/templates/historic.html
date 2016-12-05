@@ -2,12 +2,22 @@
 	<ion-nav-buttons side="right">              
     	<button class="button button-icon icon ion-log-out" ng-click="signout()"></button>
     </ion-nav-buttons>
+	<ion-nav-buttons side="left">
+    	<button id="buttonBackHistoric" class="button button-icon icon ion-ios-arrow-back" ng-click="hideMap()" style="display: none"></button>
+    </ion-nav-buttons>
+
     <ion-content class="has-bottom"> 
-		<ion-list>
+		<ion-list id="listHistoric">
 				<div class="list" id="listaHistorico">
 
 		       	</div>
 		</ion-list>		
+
+		<div class="bar bar-footer bar-balanced" style="display: none" id="buscaOnibusHistoric">
+            <h1 class="title"></h1>
+        </div>      	
+
+		<div id="historicMap" class="map" data-tap-disabled="true" style="dísplay:none"></div>
 	</ion-content>	
 </ion-view>
     
