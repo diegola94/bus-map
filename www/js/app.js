@@ -238,6 +238,7 @@ angular.module('starter', ['ionic',"firebase"])
           localStorage.removeItem('user');          
           firebase.auth().signOut();
           $state.go('tabs.home');
+          location.reload();
       }      
 }])
   
@@ -538,7 +539,7 @@ angular.module('starter', ['ionic',"firebase"])
                       })
                       // pina o caminho da linha ideal
                       $.each( $scope.PinnedLinhas, function() {                
-                              var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);                                                  
+                              var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);
                               var marker = new google.maps.Marker({
                                     position: myLatlng,
                                     map: map,
@@ -547,7 +548,26 @@ angular.module('starter', ['ionic',"firebase"])
                               });                                                                                  
 
                               map.AllMarkersArray.push(marker);
-                      })                  
+                      })
+
+                      //pina a origem e o destino
+                      var myLatlng = new google.maps.LatLng(originLatLong[0], originLatLong[1]);
+                      var originLocation = new google.maps.Marker({
+                          position: myLatlng,
+                          map: map,                
+                          title: "Você",
+                          icon: 'img/icon-origin.png'
+                      });      
+                      map.AllMarkersArray.push(originLocation);
+
+                      var myLatlng = new google.maps.LatLng(destLatLong[0], destLatLong[1]);
+                      var destLocation = new google.maps.Marker({
+                          position: myLatlng,
+                          map: map,                
+                          title: "Você",
+                          icon: 'img/icon-destination.png'
+                      });                  
+                      map.AllMarkersArray.push(destLocation);
 
                       // salva a origem e destino no localStorage do histórico do usuário
                       var email = localStorage.getItem("user");                    
@@ -1200,6 +1220,16 @@ angular.module('starter', ['ionic',"firebase"])
 
                       map.AllMarkersArray.push(marker);
               })                                                        
+
+              //pina o destino
+              var myLatlng = new google.maps.LatLng(coordDestino[0], coordDestino[1]);
+              var destLocation = new google.maps.Marker({
+                  position: myLatlng,
+                  map: map,                
+                  title: "Você",
+                  icon: 'img/icon-destination.png'
+              });                  
+              map.AllMarkersArray.push(destLocation);
         });
         $scope.hideMap = function() {
               $('#favoritesMap').hide();
@@ -1395,6 +1425,25 @@ angular.module('starter', ['ionic',"firebase"])
 
                         map.AllMarkersArray.push(marker);
                 })                                                  
+
+                //pina a origem e o destino
+                var myLatlng = new google.maps.LatLng(coordOrigem[0], coordOrigem[1]);
+                var originLocation = new google.maps.Marker({
+                    position: myLatlng,
+                    map: map,                
+                    title: "Você",
+                    icon: 'img/icon-origin.png'
+                });      
+                map.AllMarkersArray.push(originLocation);
+
+                var myLatlng = new google.maps.LatLng(coordDestino[0], coordDestino[1]);
+                var destLocation = new google.maps.Marker({
+                    position: myLatlng,
+                    map: map,                
+                    title: "Você",
+                    icon: 'img/icon-destination.png'
+                });                  
+                map.AllMarkersArray.push(destLocation);
           });
 
           $scope.hideMap = function() {
@@ -1403,6 +1452,30 @@ angular.module('starter', ['ionic',"firebase"])
                 $('#listHistoric').show();
                 $("#buscaOnibusHistoric").hide();
           }                      
+
+          // definição da função que acha o marker mais próximo
+          function rad(x) {return x*Math.PI/180;}
+          function find_closest_marker( lat, lng, markerArray ) {                
+              var R = 6371; // radius of earth in km
+              var distances = [];
+              var closest = -1;
+              for( i=0;i<markerArray.length; i++ ) {
+                  var mlat = markerArray[i].position.lat();
+                  var mlng = markerArray[i].position.lng();
+                  var dLat  = rad(mlat - lat);
+                  var dLong = rad(mlng - lng);
+                  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
+                  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                  var d = R * c;
+                  distances[i] = d;
+                  if ( closest == -1 || d < distances[closest] ) {
+                      closest = i;
+                  }
+              }
+
+              return markerArray[closest].title;
+          }  
     }
 ])
 

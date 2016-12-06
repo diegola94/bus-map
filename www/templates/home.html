@@ -7,12 +7,12 @@
                 <div class="item item-input bm-search bm-ida">
                     <i class="icon ion-search placeholder-icon"></i>
                     <input type="search" id="txtOrigin" placeholder="Origem">
-                    <button type="button" class="button button-icon icon energized ion-ios-star showPopupOrig"></button>
+                    <button type="button" class="button button-icon icon energized ion-ios-star showPopupOrig {{isConnected()}}"></button>
                 </div>
                 <div class="item item-input bm-search bm-volta">
                     <i class="icon ion-search placeholder-icon"></i>
                     <input type="search" id="txtDestination" placeholder="Destino">
-                    <button type="button" class="button button-icon icon energized ion-ios-star showPopupDest"></button>
+                    <button type="button" class="button button-icon icon energized ion-ios-star showPopupDest {{isConnected()}}"></button>
                 </div>
                 <p class="item item-input bm-search bm-checkbox">
                     <input type="checkbox" id="show-pin" />
