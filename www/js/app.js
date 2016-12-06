@@ -25,6 +25,7 @@ angular.module('starter', ['ionic',"firebase"])
 })
 
 .run(function($ionicPlatform, $rootScope, $state, $ionicPopup) {
+  
   $rootScope.signout = function() {
     $rootScope.showConfirm();
   }
@@ -60,6 +61,7 @@ angular.module('starter', ['ionic',"firebase"])
   };
 
   $ionicPlatform.ready(function() {
+    
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
       // for form inputs)
@@ -71,7 +73,7 @@ angular.module('starter', ['ionic',"firebase"])
       cordova.plugins.Keyboard.disableScroll(true);
     }
     if(window.StatusBar) {
-      StatusBar.styleDefault();
+      StatusBar.hide();
     }
   });
 })
@@ -104,7 +106,7 @@ angular.module('starter', ['ionic',"firebase"])
         templateUrl: "templates/signup.html",
         controller: "Signup"
        
-    })
+    })  
 
     // Each tab has its own nav history stack:    
     .state('tabs', {      
@@ -579,7 +581,154 @@ angular.module('starter', ['ionic',"firebase"])
                       }
                       event.preventDefault();
                   }
-            });          
+            });     
+            
+            $(".showPopupOrig").click(function() {                  
+                if ($('#txtOrigin').val() === undefined || $('#txtOrigin').val() === "" || $('#txtOrigin').val() === null){
+                  var alertPopup = $ionicPopup.alert({
+                         title: 'Alerta',
+                         template: 'O campo de origem deve estar preenchido para adicionar um favorito'
+                  });  
+                } 
+                else if (originLatLong === undefined || originLatLong.length <= 0 || originLatLong === null) {
+                      var alertPopup = $ionicPopup.alert({
+                         title: 'Alerta',
+                         template: 'Selecione um endereço válido'
+                      });                    
+                } else {
+                   $scope.data = {}
+                   // An elaborate, custom popup
+                   var myPopup = $ionicPopup.show({               
+                   template: '<input type="text" ng-model="data.apelido" placeholder="Apelido para Rota">',
+                   title: 'Adicionar nova rota favorita',                   
+                   scope: $scope,
+                   buttons: [
+                     { text: 'Cancelar' },
+                     {
+                       text: '<b>Salvar</b>',
+                       type: 'button-positive',
+                       onTap: function(e) {
+                           if (!$scope.data.apelido) {
+                             //don't allow the user to close unless he enters wifi password
+                             e.preventDefault();
+                           } else {
+                             return $scope.data.apelido;
+                           }
+                        }
+                      }
+                    ]
+                  });                 
+                  
+                  
+                  myPopup.then(function(res) {
+                      if (res) {
+                        var Storagefavoritos = [];
+                        var email = localStorage.getItem("user");
+                        if(email != null || email != undefined || email != '' ){
+                          Storagefavoritos = JSON.parse(localStorage.getItem(email + "_favoritos"));      
+                        }
+                        if(Storagefavoritos == null || Storagefavoritos == undefined){
+                          Storagefavoritos = [];
+                        }
+                        
+                        var favorito = {
+                              apelido:$scope.data.apelido,
+                              endereco:document.getElementById('txtOrigin').value,                              
+                              coordEndereco: {
+                                x: originLatLong[0],
+                                y: originLatLong[1]
+                              }
+                        };
+                        
+                        Storagefavoritos.push(favorito);
+
+                        if(email != null || email != undefined || email != '' ){
+                          localStorage.setItem(email + "_favoritos", JSON.stringify(Storagefavoritos));
+                        }
+                        
+                        var alertPopup = $ionicPopup.alert({
+                          title: 'Sucesso!',
+                          template: 'O endereço foi salvo como favorito!'
+                        });                          
+                      }
+                  });
+                }
+            })
+            
+            $(".showPopupDest" ).click(function(event) {               
+               if ($('#txtDestination').val() === undefined || $('#txtDestination').val() === "" || $('#txtDestination').val() === null){
+                  var alertPopup = $ionicPopup.alert({
+                         title: 'Alerta',
+                         template: 'O campo de destino deve estar preenchido'
+                  });  
+                } 
+                else if (destLatLong === undefined || destLatLong.length <= 0 || destLatLong === null) {
+                      var alertPopup = $ionicPopup.alert({
+                         title: 'Alerta',
+                         template: 'Selecione um endereço válido'
+                      });                    
+                } else {
+                   $scope.data = {}
+                   // An elaborate, custom popup
+                   var myPopup = $ionicPopup.show({               
+                   template: '<input type="text" ng-model="data.apelido" placeholder="Apelido para Rota">',
+                   title: 'Adicionar nova rota favorita',                   
+                   scope: $scope,
+                   buttons: [
+                     { text: 'Cancelar' },
+                     {
+                       text: '<b>Salvar</b>',
+                       type: 'button-positive',
+                       onTap: function(e) {
+                         if (!$scope.data.apelido) {
+                           //don't allow the user to close unless he enters wifi password
+                           e.preventDefault();
+                         } else {
+                           return $scope.data.apelido;
+                         }
+                       }
+                     }
+                    ]
+                  });                 
+                  
+                  
+                  myPopup.then(function(res) {
+                      if (res) {
+                        var Storagefavoritos = [];
+                        var email = localStorage.getItem("user");
+                        if(email != null || email != undefined || email != '' ){
+                          Storagefavoritos = JSON.parse(localStorage.getItem(email + "_favoritos"));      
+                        }
+                        if(Storagefavoritos == null || Storagefavoritos == undefined){
+                          Storagefavoritos = [];
+                        }
+                        
+                        var favorito = {
+                              apelido:$scope.data.apelido,
+                              endereco:document.getElementById('txtDestination').value,                              
+                              coordEndereco: {
+                                x: destLatLong[0],
+                                y: destLatLong[1]
+                              }
+                        };
+                        
+                        Storagefavoritos.push(favorito);
+
+                        if(email != null || email != undefined || email != '' ){
+                          localStorage.setItem(email + "_favoritos", JSON.stringify(Storagefavoritos));
+                        }
+                        
+                        var alertPopup = $ionicPopup.alert({
+                          title: 'Sucesso!',
+                          template: 'O endereço foi salvo como favorito!'
+                        });    
+                      }
+                  });
+                }
+            })
+            
+            
+                 
             // definição da função que acha o marker mais próximo
             function rad(x) {return x*Math.PI/180;}
             function find_closest_marker( lat, lng, markerArray ) {                
@@ -855,14 +1004,28 @@ angular.module('starter', ['ionic',"firebase"])
 ])
 
 .controller('FavoritesController', ["$scope", '$ionicLoading', '$ionicPopup', '$http', "BusStopJson", 
-  function($scope, $ionicLoading, $ionicPopup, $http, BusStopJson) {          
- 
-      var templateElemento = '<div class="item item-avatar item-button-right">'
-                           + '<img src="../img/bus-map-icon-star.jpg">'
-                           + '<p>#apelido#</p>'
-                           + '<span>#rota#</span>'
-                           + '<!-- <button class="button button-clear button-assertive"> <i class="icon ion-close-circled"></i></button>-->'
-                           + '<button data-index="#index#" class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear click-excluir-fav"></button>'
+  function($scope, $ionicLoading, $ionicPopup, $http, BusStopJson) {                                                                                           
+      $scope.PinnedLinhas = [];
+      var AllMarkersArray = [];
+
+      $.each( BusStopJson.busStopList, function() {                
+            var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);
+            
+            var marker = new google.maps.Marker({
+                  position: myLatlng,                      
+                  icon: 'img/icon-bus-stop.png',
+                  title: JSON.stringify(this)
+            });                              
+            
+            AllMarkersArray.push(marker);              
+      });   
+
+      var templateElemento = '<div class="item item-avatar item-button-right" style="cursor:pointer">'
+                           +      '<img src="img/bus-map-icon-star.jpg" class="click-show-favorites">'
+                           +      '<p class="click-show-favorites">#apelido#</p>'
+                           +      '<span class="click-show-favorites">#endereco#</span>'                           
+                           +      '<input type="hidden" value="#coordEndereco#">'
+                           +      '<button data-index="#index#" class="button button-icon button-list-fav icon ion-close-circled button-assertive button-clear click-excluir-fav"></button>'                           
                            + '</div>';      
             
       var ElementoListaFavoritos = angular.element( document.querySelector( '#listaFavoritos' ) );
@@ -875,7 +1038,10 @@ angular.module('starter', ['ionic',"firebase"])
 
       for (i in Storagefavoritos)
       {
-        var elemento = templateElemento.replace("#index#",i).replace("#apelido#",Storagefavoritos[i].apelido).replace("#rota#",Storagefavoritos[i].rota);
+        var elemento = templateElemento.replace("#index#",i)
+        .replace("#apelido#",Storagefavoritos[i].apelido)
+        .replace("#endereco#",Storagefavoritos[i].endereco)
+        .replace("#coordEndereco#",Storagefavoritos[i].coordEndereco.x + '#' + Storagefavoritos[i].coordEndereco.y);
         ElementoListaFavoritos.append(elemento);
       }
       
@@ -907,57 +1073,167 @@ angular.module('starter', ['ionic',"firebase"])
            });      
        })
 
+        $('.click-show-favorites').click(function () {
+              $('#favoritesMap').show();
+              $('#buttonBackFavorites').show();
+              $('#listFavorites').hide();
+              $this = $(this);      
+              
+              var coordOrigem = [];
+              
+              navigator.geolocation.getCurrentPosition(function(pos) {
+                coordOrigem.push(pos.coords.latitude);
+                coordOrigem.push(pos.coords.longitude);
+              });
 
-      $scope.showPopup = function() {
-           $scope.data = {}
-           // An elaborate, custom popup
-           var myPopup = $ionicPopup.show({
-           template: '<input type="text" ng-model="data.apelido" placeholder="Apelido para Rota"><br /><input type="text" ng-model="data.rota" placeholder="Rota">',
-           title: 'Adicionar nova rota favorito',
-           subTitle: '',
-           scope: $scope,
-           buttons: [
-             { text: 'Cancelar' },
-             {
-               text: '<b>Salvar</b>',
-               type: 'button-positive',
-               onTap: function(e) {
-                 if (!$scope.data.apelido) {
-                   //don't allow the user to close unless he enters wifi password
-                   e.preventDefault();
-                 } else {
-                   return $scope.data.apelido;
-                 }
-               }
-             },]
-          });                 
-      
-          myPopup.then(function(res) {
-              if (res) {
-                var Storagefavoritos = [];
-                var email = localStorage.getItem("user");
-                if(email != null || email != undefined || email != '' ){
-                  Storagefavoritos = JSON.parse(localStorage.getItem(email + "_favoritos"));      
-                }
-                if(Storagefavoritos == null || Storagefavoritos == undefined){
-                  Storagefavoritos = [];
-                }
-                var favorito = {
-                    apelido:$scope.data.apelido,
-                    rota:$scope.data.rota
-                  };
-                
-                Storagefavoritos.push(favorito);
-
-                if(email != null || email != undefined || email != '' ){
-                  localStorage.setItem(email + "_favoritos", JSON.stringify(Storagefavoritos));
-                }
-                
-                location.reload();
+              if(coordOrigem.length == 0){
+                  coordOrigem.push("-23.9804479");
+                  coordOrigem.push("-46.3109819"); 
               }
-          });
-    }
-  }   
+
+              var coordDestino = ($this.parent().children('input')[0].value).split('#');
+                                            
+              var markersArray = [];
+              var myLatlng = new google.maps.LatLng(-23.9804479, -46.3109819);                 
+
+              var mapOptions = {
+                  center: new google.maps.LatLng(coordDestino[0], coordDestino[1]),
+                  zoom: 16,
+                  mapTypeId: google.maps.MapTypeId.ROADMAP,         
+                  mapTypeControl: false,
+                  styles: [{
+                    featureType: "transit.station.bus",
+                    stylers: [
+                      { visibility: "off" }
+                    ]
+                  }]
+              };
+              
+              var directionsService = new google.maps.DirectionsService;
+              var directionsDisplay = new google.maps.DirectionsRenderer;                 
+              var map = new google.maps.Map(document.getElementById("favoritesMap"), mapOptions);
+       
+              directionsDisplay.setMap(map);
+
+              var myLocation = new google.maps.Marker({
+                      position: myLatlng,
+                      map: map,                
+                      title: "Você",
+                      icon: 'img/icon-you-here.png'
+              });
+
+              $scope.map = map;                            
+              
+              map.AllMarkersArray = AllMarkersArray;
+
+              //pega o ponto mais próximo da origem
+              var nearestBusStopOrigin = JSON.parse(find_closest_marker(coordOrigem[0], coordOrigem[1], AllMarkersArray));
+              
+              for (var i = 0; i < map.AllMarkersArray.length; i++ ) 
+                    map.AllMarkersArray[i].setMap(null);
+
+              map.AllMarkersArray.length = 0;
+
+              // Pega todos os pontos de onibus, que tem as linhas que o ponto de origem possui.
+              $.each(BusStopJson.busStopList, function() {
+                  var busStops = this;
+                  $.each(this.LINHAS, function() {
+                      var linhaMapa = this.LINHA;
+                      $.each(nearestBusStopOrigin.LINHAS, function() {                             
+                        if(this.LINHA == linhaMapa){
+                            $scope.PinnedLinhas.push(busStops);
+                        }
+                      })
+                  })
+              })                                                    
+              // Pina no mapa todos os pontos de onibus, que tem as linhas que o ponto de origem possui.
+              $.each( $scope.PinnedLinhas, function() {                
+                      var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);                                                  
+                      var marker = new google.maps.Marker({
+                            position: myLatlng,
+                            map: map,
+                            title: JSON.stringify(this)
+                      });                                                                                  
+
+                      map.AllMarkersArray.push(marker);
+              })
+              // pega o ponto mais próximo do destino.
+              var nearestBusStopDest = JSON.parse(find_closest_marker(coordDestino[0], coordDestino[1], map.AllMarkersArray));
+              $scope.linhaEscolhida = "";
+              // compara o ponto mais próximo da origem e destino, para definir qual a linha ideal.
+              $.each(nearestBusStopOrigin.LINHAS, function() {                             
+                  var nearestLinhaOrigin = this.LINHA;
+                  $.each(nearestBusStopDest.LINHAS, function() {
+                      if(nearestLinhaOrigin == this.LINHA){
+                        $scope.linhaEscolhida = this.LINHA;
+                        $("#buscaOnibusFavorites").show();
+                        $("#buscaOnibusFavorites").children('h1').html('Melhor Linha: ' + this.LINHA);
+                        return false;
+                      }
+                  })
+              })
+              // limpa os pontos
+              for (var i = 0; i < map.AllMarkersArray.length; i++ ) 
+                    map.AllMarkersArray[i].setMap(null);
+
+              map.AllMarkersArray.length = 0;
+              // monta o caminho da linha ideal
+              $scope.PinnedLinhas = [];
+              $.each(BusStopJson.busStopList, function() {
+                  var busStops = this;
+
+                  $.each(this.LINHAS, function() {                
+                      if(this.LINHA == $scope.linhaEscolhida){
+                          $scope.PinnedLinhas.push(busStops);
+                      }
+                  })
+              })
+              // pina o caminho da linha ideal
+              $.each( $scope.PinnedLinhas, function() {                
+                      var myLatlng = new google.maps.LatLng(this.COORDINATEY, this.COORDINATEX);                                                  
+                      var marker = new google.maps.Marker({
+                            position: myLatlng,
+                            map: map,
+                            title: JSON.stringify(this),
+                            icon: 'img/icon-route.png'
+                      });                                                                                  
+
+                      map.AllMarkersArray.push(marker);
+              })                                                        
+        });
+        $scope.hideMap = function() {
+              $('#favoritesMap').hide();
+              $('#buttonBackFavorites').hide();
+              $('#listFavorites').show();
+              $("#buscaOnibusFavorites").hide();
+        }       
+
+        // definição da função que acha o marker mais próximo
+        function rad(x) {return x*Math.PI/180;}
+        function find_closest_marker( lat, lng, markerArray ) {                
+            var R = 6371; // radius of earth in km
+            var distances = [];
+            var closest = -1;
+            for( i=0;i<markerArray.length; i++ ) {
+                var mlat = markerArray[i].position.lat();
+                var mlng = markerArray[i].position.lng();
+                var dLat  = rad(mlat - lat);
+                var dLong = rad(mlng - lng);
+                var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
+                var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                var d = R * c;
+                distances[i] = d;
+                if ( closest == -1 || d < distances[closest] ) {
+                    closest = i;
+                }
+            }
+
+            return markerArray[closest].title;
+        }  
+  }  
+  
+   
 ])
 
 .controller('HistoricController', ["$scope", '$ionicLoading', '$http', "BusStopJson", 
@@ -978,7 +1254,7 @@ angular.module('starter', ['ionic',"firebase"])
           });   
           
           var templateElemento = '<div class="item item-avatar item-button-right">'
-                               + '  <img src="../img/bus-map-icon-historic.jpg">'
+                               + '  <img src="img/bus-map-icon-historic.jpg">'
                                + '  <span>#origem#</span><br />'
                                + '  <input type="hidden" value="#coordOrigem#">'
                                + '  <span class="span-list">#destino#</span>'   
@@ -1126,31 +1402,7 @@ angular.module('starter', ['ionic',"firebase"])
                 $('#buttonBackHistoric').hide();
                 $('#listHistoric').show();
                 $("#buscaOnibusHistoric").hide();
-          }
-          
-          // definição da função que acha o marker mais próximo
-          function rad(x) {return x*Math.PI/180;}
-          function find_closest_marker( lat, lng, markerArray ) {                
-              var R = 6371; // radius of earth in km
-              var distances = [];
-              var closest = -1;
-              for( i=0;i<markerArray.length; i++ ) {
-                  var mlat = markerArray[i].position.lat();
-                  var mlng = markerArray[i].position.lng();
-                  var dLat  = rad(mlat - lat);
-                  var dLong = rad(mlng - lng);
-                  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
-                  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                  var d = R * c;
-                  distances[i] = d;
-                  if ( closest == -1 || d < distances[closest] ) {
-                      closest = i;
-                  }
-              }
-
-              return markerArray[closest].title;
-          }      
+          }                      
     }
 ])
 

@@ -1,16 +1,23 @@
 <ion-view view-title="Favoritos">
 	<ion-nav-buttons side="right">              
     	<button class="button button-icon icon ion-log-out" ng-click="signout()"></button>
+    </ion-nav-buttons>    	
+    <ion-nav-buttons side="left">
+    	<button id="buttonBackFavorites" class="button button-icon icon ion-ios-arrow-back" ng-click="hideMap()" style="display: none"></button>
     </ion-nav-buttons>
-    <ion-nav-buttons side="left">              
-    	<button class="button button-icon icon ion-ios-plus-outline" ng-click="showPopup()"></button>
-    </ion-nav-buttons>
+
     <ion-content class="has-bottom">
-		<ion-list>						
+		<ion-list id="listFavorites">						
 				<div class="list" id="listaFavoritos">
 
 		       	</div>
 		</ion-list>						
+
+		<div class="bar bar-footer bar-balanced" style="display: none" id="buscaOnibusFavorites">
+            <h1 class="title"></h1>
+        </div>      
+
+		<div id="favoritesMap" class="map" data-tap-disabled="true" style="dísplay:none"></div>
 	</ion-content>	
 </ion-view>
     

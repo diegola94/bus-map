@@ -4,14 +4,16 @@
         </ion-nav-buttons>
         <ion-content class="has-bottom">
             <form id="calcRouteForm">
-                <label class="item item-input bm-search bm-ida">
+                <div class="item item-input bm-search bm-ida">
                     <i class="icon ion-search placeholder-icon"></i>
                     <input type="search" id="txtOrigin" placeholder="Origem">
-                </label>
-                <label class="item item-input bm-search bm-volta">
+                    <button type="button" class="button button-icon icon energized ion-ios-star showPopupOrig"></button>
+                </div>
+                <div class="item item-input bm-search bm-volta">
                     <i class="icon ion-search placeholder-icon"></i>
                     <input type="search" id="txtDestination" placeholder="Destino">
-                </label>
+                    <button type="button" class="button button-icon icon energized ion-ios-star showPopupDest"></button>
+                </div>
                 <p class="item item-input bm-search bm-checkbox">
                     <input type="checkbox" id="show-pin" />
                     <label for="show-pin">Mostrar todos os pontos</label>
